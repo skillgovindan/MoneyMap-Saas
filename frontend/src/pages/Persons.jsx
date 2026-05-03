@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import personService from '../services/personService';
+import lentMoneyService from '../services/lentMoneyService';
+import borrowedMoneyService from '../services/borrowedMoneyService';
 
 const Persons = () => {
   const [persons, setPersons] = useState([]);
@@ -13,13 +15,44 @@ const Persons = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const data = await personService.getAllPersons();
+      const [personsData, lentData, borrowedData] = await Promise.all([
+        personService.getAllPersons(),
+        lentMoneyService.getAllLentMoney(),
+        borrowedMoneyService.getAllBorrowedMoney()
+      ]);
+
+      const lentList = lentData || [];
+      const borrowedList = borrowedData || [];
+
+      const getPersonId = (personValue) => {
+        if (!personValue) return "";
+        if (typeof personValue === "object") return personValue._id || personValue.id || "";
+        return personValue;
+      };
+
+      const personsWithAmounts = (personsData || []).map(p => {
+        const pId = p._id;
+        const lentAmount = lentList
+          .filter(l => getPersonId(l.person) === pId)
+          .reduce((sum, l) => sum + (Number(l.amount) || 0), 0);
+          
+        const borrowedAmount = borrowedList
+          .filter(b => getPersonId(b.person) === pId)
+          .reduce((sum, b) => sum + (Number(b.amount) || 0), 0);
+          
+        return {
+          ...p,
+          lentAmount,
+          borrowedAmount
+        };
+      });
+
       // sort latest first by createdAt
-      const sortedData = (data || []).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      const sortedData = personsWithAmounts.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
       setPersons(sortedData);
       setError(null);
     } catch (err) {
-      setError(err.message || 'Failed to fetch persons');
+      setError(err.message || 'Failed to fetch persons and amounts');
     } finally {
       setLoading(false);
     }
@@ -76,11 +109,6 @@ const Persons = () => {
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  };
-
   return (
     <div className="page-container persons-page">
       <div className="page-header">
@@ -106,7 +134,8 @@ const Persons = () => {
                   <th>Person Name</th>
                   <th>Phone Number</th>
                   <th>Address</th>
-                  <th>Created Date</th>
+                  <th>Lent Amount</th>
+                  <th>Borrowed Amount</th>
                   <th style={{textAlign: 'right'}}>Actions</th>
                 </tr>
               </thead>
@@ -116,7 +145,8 @@ const Persons = () => {
                     <td>{p.name}</td>
                     <td>{p.phoneNumber || '-'}</td>
                     <td>{p.address || '-'}</td>
-                    <td>{formatDate(p.createdAt)}</td>
+                    <td style={{ color: '#059669', fontWeight: '500' }}>₹{p.lentAmount ? p.lentAmount.toLocaleString('en-IN') : '0'}</td>
+                    <td style={{ color: '#dc2626', fontWeight: '500' }}>₹{p.borrowedAmount ? p.borrowedAmount.toLocaleString('en-IN') : '0'}</td>
                     <td className="actions-cell">
                       <button className="btn btn-secondary btn-sm" onClick={() => openModal(p)}>Edit</button>
                       <button className="btn btn-danger btn-sm" onClick={() => handleDelete(p._id)}>Delete</button>
@@ -136,7 +166,8 @@ const Persons = () => {
                 <div className="card-body">
                   <p><strong>Phone:</strong> {p.phoneNumber || '-'}</p>
                   <p><strong>Address:</strong> {p.address || '-'}</p>
-                  <p><strong>Created:</strong> {formatDate(p.createdAt)}</p>
+                  <p><strong>Lent Amount:</strong> <span style={{ color: '#059669', fontWeight: '500' }}>₹{p.lentAmount ? p.lentAmount.toLocaleString('en-IN') : '0'}</span></p>
+                  <p><strong>Borrowed Amount:</strong> <span style={{ color: '#dc2626', fontWeight: '500' }}>₹{p.borrowedAmount ? p.borrowedAmount.toLocaleString('en-IN') : '0'}</span></p>
                 </div>
                 <div className="card-actions">
                   <button className="btn btn-secondary btn-sm" onClick={() => openModal(p)}>Edit</button>
