@@ -12,7 +12,11 @@ import WeeklyReport from './pages/WeeklyReport';
 import MonthlyReport from './pages/MonthlyReport';
 import YearlyReport from './pages/YearlyReport';
 import Categories from './pages/Categories';
+import Persons from './pages/Persons';
 
+import DueTracker from './pages/DueTracker';
+import LentMoneyForm from './pages/LentMoneyForm';
+import BorrowedMoneyForm from './pages/BorrowedMoneyForm';
 function App() {
   return (
     <BrowserRouter>
@@ -33,6 +37,13 @@ function App() {
           <Route path="reports/monthly" element={<MonthlyReport />} />
           <Route path="reports/yearly" element={<YearlyReport />} />
           <Route path="categories" element={<Categories />} />
+          <Route path="persons" element={<Persons />} />
+
+          <Route path="due-tracker" element={<DueTracker />} />
+          <Route path="due-tracker/lent/add" element={<LentMoneyForm />} />
+          <Route path="due-tracker/lent/edit/:id" element={<LentMoneyForm />} />
+          <Route path="due-tracker/borrowed/add" element={<BorrowedMoneyForm />} />
+          <Route path="due-tracker/borrowed/edit/:id" element={<BorrowedMoneyForm />} />
         </Route>
       </Routes>
     </BrowserRouter>

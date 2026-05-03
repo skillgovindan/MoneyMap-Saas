@@ -45,6 +45,12 @@ const Sidebar = () => {
 
         <div className="nav-section">
           <div className="nav-section-title">Management</div>
+          <NavLink to="/persons" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+            Persons
+          </NavLink>
+          <NavLink to="/due-tracker" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+            Due Tracker
+          </NavLink>
           <NavLink to="/categories" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
             Categories
           </NavLink>

@@ -12,6 +12,10 @@ const balanceRoutes = require("./routes/balanceRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const transactionRoutes = require("./routes/transactionRoutes");
 const paymentMethodRoutes = require("./routes/paymentMethodRoutes");
+const lentMoneyRoutes = require("./routes/lentMoneyRoutes");
+const borrowedMoneyRoutes = require("./routes/borrowedMoneyRoutes");
+const personRoutes = require("./routes/personRoutes");
+
 
 dotenv.config();
 connectDB();
@@ -31,6 +35,10 @@ app.use("/api/balance", balanceRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/payment-methods", paymentMethodRoutes);
+app.use("/api/lent-money", lentMoneyRoutes);
+app.use("/api/borrowed-money", borrowedMoneyRoutes);
+app.use("/api/persons", personRoutes);
+
 
 app.get("/", (req, res) => {
   res.send("Backend running");
