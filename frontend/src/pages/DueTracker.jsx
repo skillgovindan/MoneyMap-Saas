@@ -135,98 +135,65 @@ const DueTracker = () => {
     }
   };
 
-  const renderTable = (records, type) => {
+  const renderList = (records, type) => {
     const isLent = type === 'lent';
     
     if (records.length === 0) {
       return (
-        <div className="empty-state">
-          No {isLent ? 'lent' : 'borrowed'} money records found.
+        <div className="empty-state" style={{ padding: '32px', textAlign: 'center', background: '#ffffff', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
+          <p style={{ color: '#4b5563', marginBottom: '12px' }}>No {isLent ? 'lent' : 'borrowed'} money records found.</p>
+          <Link to={`/due-tracker/${isLent ? 'lent' : 'borrowed'}/add`} className="btn btn-primary btn-sm">
+            + Add {isLent ? 'Lent' : 'Borrowed'} Money
+          </Link>
         </div>
       );
     }
 
     return (
-      <>
-        <div className="table-container desktop-only">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Person</th>
-                <th>Category</th>
-                <th>Amount</th>
-                <th>Taken Date</th>
-                <th>Paying Date</th>
-                <th>Status</th>
-                <th>Notes</th>
-                <th style={{textAlign: 'right'}}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {records.map(record => {
-                const personInfo = getPersonDetails(record.person);
-                const categoryInfo = getCategoryDetails(record.category);
-                return (
-                  <tr key={record._id}>
-                    <td>
-                      {personInfo.name}
-                      {personInfo.phoneNumber && <div style={{fontSize: '0.8rem', color: '#6b7280'}}>{personInfo.phoneNumber}</div>}
-                    </td>
-                    <td>{categoryInfo.name}</td>
-                    <td style={{fontWeight: '500'}}>{formatCurrency(record.amount)}</td>
-                    <td>{formatDate(record.takenDate)}</td>
-                    <td>{formatDate(record.payingDate)}</td>
-                    <td>
-                      <span className={`status-badge ${record.isPaid ? 'paid' : 'pending'}`}>
-                        {record.isPaid ? 'Paid' : 'Not Paid'}
-                      </span>
-                    </td>
-                    <td>{record.notes || '-'}</td>
-                    <td className="actions-cell">
-                      <button className="btn btn-secondary btn-sm" onClick={() => navigate(`/due-tracker/${isLent ? 'lent' : 'borrowed'}/edit/${record._id}`)}>Edit</button>
-                      <button className="btn btn-danger btn-sm" onClick={() => isLent ? handleDeleteLent(record._id) : handleDeleteBorrowed(record._id)}>Delete</button>
-                      <button className={`btn btn-sm ${record.isPaid ? 'btn-secondary' : 'btn-success'}`} onClick={() => isLent ? toggleLentStatus(record) : toggleBorrowedStatus(record)}>
-                        {record.isPaid ? 'Mark Not Paid' : 'Mark Paid'}
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="mobile-only cards-container">
-          {records.map(record => {
-            const personInfo = getPersonDetails(record.person);
-            const categoryInfo = getCategoryDetails(record.category);
-            return (
-              <div key={record._id} className="record-card">
-                <div className="card-header">
-                  <h3 className="card-title-text">{personInfo.name}</h3>
-                  <span className={`status-badge ${record.isPaid ? 'paid' : 'pending'}`}>
-                    {record.isPaid ? 'Paid' : 'Not Paid'}
-                  </span>
+      <div className="compact-list">
+        {records.map(record => {
+          const personInfo = getPersonDetails(record.person);
+          const categoryInfo = getCategoryDetails(record.category);
+          
+          return (
+            <div key={record._id} className="list-row">
+              <div className="row-main">
+                <div className="row-info">
+                  <div className="row-title">
+                    <span className="person-name">{personInfo.name}</span>
+                    <span className="row-amount">{formatCurrency(record.amount)}</span>
+                    <span className={`status-badge ${record.isPaid ? 'paid' : 'pending'}`}>
+                      {record.isPaid ? 'Paid' : 'Not Paid'}
+                    </span>
+                  </div>
+                  
+                  <div className="row-sub">
+                    <span className="category-text">{categoryInfo.name}</span>
+                    <span className="dot-separator">•</span>
+                    <span className="date-text">Taken: {formatDate(record.takenDate)}</span>
+                    {record.payingDate && (
+                      <>
+                        <span className="dot-separator">•</span>
+                        <span className="date-text">Paying: {formatDate(record.payingDate)}</span>
+                      </>
+                    )}
+                  </div>
+                  
+                  {record.notes && <div className="row-notes">{record.notes}</div>}
                 </div>
-                <div className="card-body">
-                  <p><strong>Category:</strong> {categoryInfo.name}</p>
-                  <p><strong>Amount:</strong> <span style={{fontWeight: 'bold', color: '#111827'}}>{formatCurrency(record.amount)}</span></p>
-                  <p><strong>Taken:</strong> {formatDate(record.takenDate)}</p>
-                  <p><strong>Paying:</strong> {formatDate(record.payingDate)}</p>
-                  {record.notes && <p><strong>Notes:</strong> {record.notes}</p>}
-                </div>
-                <div className="card-actions">
-                  <button className="btn btn-secondary btn-sm" onClick={() => navigate(`/due-tracker/${isLent ? 'lent' : 'borrowed'}/edit/${record._id}`)}>Edit</button>
-                  <button className="btn btn-danger btn-sm" onClick={() => isLent ? handleDeleteLent(record._id) : handleDeleteBorrowed(record._id)}>Delete</button>
-                  <button className={`btn btn-sm ${record.isPaid ? 'btn-secondary' : 'btn-success'}`} onClick={() => isLent ? toggleLentStatus(record) : toggleBorrowedStatus(record)} style={{flex: 1}}>
+                
+                <div className="row-actions">
+                  <button className="action-link" onClick={() => navigate(`/due-tracker/${isLent ? 'lent' : 'borrowed'}/edit/${record._id}`)}>Edit</button>
+                  <button className="action-link text-danger" onClick={() => isLent ? handleDeleteLent(record._id) : handleDeleteBorrowed(record._id)}>Delete</button>
+                  <button className={`action-btn ${record.isPaid ? 'btn-outline' : 'btn-fill'}`} onClick={() => isLent ? toggleLentStatus(record) : toggleBorrowedStatus(record)}>
                     {record.isPaid ? 'Mark Not Paid' : 'Mark Paid'}
                   </button>
                 </div>
               </div>
-            );
-          })}
-        </div>
-      </>
+            </div>
+          );
+        })}
+      </div>
     );
   };
 
@@ -235,239 +202,302 @@ const DueTracker = () => {
 
   return (
     <div className="page-container due-tracker-page">
-      <div className="page-header">
+      <div className="page-header compact-header">
         <div>
           <h1 className="page-title" style={{marginBottom: '0.25rem'}}>Due Tracker</h1>
-          <p style={{ color: '#6b7280', fontSize: '0.9rem', margin: 0 }}>Track money lent, borrowed, and pending dues.</p>
+          <p style={{ color: '#6b7280', fontSize: '0.85rem', margin: 0 }}>Track money lent, borrowed, and pending dues.</p>
+        </div>
+        <div className="header-actions">
+          {activeTab === 'Lent Money' ? (
+            <Link to="/due-tracker/lent/add" className="btn btn-primary btn-sm"><LentIcon size={16} />Add Lent Money</Link>
+          ) : (
+            <Link to="/due-tracker/borrowed/add" className="btn btn-primary btn-sm"><BorrowedIcon size={16} />Add Borrowed Money</Link>
+          )}
         </div>
       </div>
 
-      <div className="summary-grid">
-        <div className="summary-card">
-          <h3 className="summary-title">Total Lent</h3>
-          <p className="summary-value text-primary">{formatCurrency(totalLent)}</p>
+      <div className="summary-bar">
+        <div className="summary-item">
+          <span className="summary-label">Total Lent</span>
+          <span className="summary-val text-primary">{formatCurrency(totalLent)}</span>
         </div>
-        <div className="summary-card">
-          <h3 className="summary-title">Total Borrowed</h3>
-          <p className="summary-value text-primary">{formatCurrency(totalBorrowed)}</p>
+        <div className="summary-item">
+          <span className="summary-label">Total Borrowed</span>
+          <span className="summary-val text-primary">{formatCurrency(totalBorrowed)}</span>
         </div>
-        <div className="summary-card">
-          <h3 className="summary-title">Pending Lent</h3>
-          <p className="summary-value text-danger">{formatCurrency(pendingLent)}</p>
+        <div className="summary-item">
+          <span className="summary-label">Pending Lent</span>
+          <span className="summary-val text-danger">{formatCurrency(pendingLent)}</span>
         </div>
-        <div className="summary-card">
-          <h3 className="summary-title">Pending Borrowed</h3>
-          <p className="summary-value text-danger">{formatCurrency(pendingBorrowed)}</p>
+        <div className="summary-item">
+          <span className="summary-label">Pending Borrowed</span>
+          <span className="summary-val text-danger">{formatCurrency(pendingBorrowed)}</span>
         </div>
       </div>
 
-      <div className="tabs-container">
+      <div className="compact-tabs">
         {['Lent Money', 'Borrowed Money'].map(tab => (
-          <div key={tab} className={`tab-item ${activeTab === tab ? 'active' : ''}`} onClick={() => setActiveTab(tab)}>
-            {tab === 'Lent Money' ? <LentIcon /> : <BorrowedIcon />}
+          <div key={tab} className={`compact-tab ${activeTab === tab ? 'active' : ''}`} onClick={() => setActiveTab(tab)}>
+            {tab === 'Lent Money' ? <LentIcon size={16} /> : <BorrowedIcon size={16} />}
             {tab}
           </div>
         ))}
       </div>
 
-      {activeTab === 'Lent Money' && (
-        <div className="tab-content">
-          <div className="tab-header">
-            <h2 className="section-title"><LentIcon size={22} style={{ marginRight: '8px', verticalAlign: 'text-bottom', color: '#4f46e5' }} />Lent Money</h2>
-            <Link to="/due-tracker/lent/add" className="btn btn-primary"><LentIcon />Add Lent Money</Link>
-          </div>
-          {renderTable(lentMoney, 'lent')}
-        </div>
-      )}
-
-      {activeTab === 'Borrowed Money' && (
-        <div className="tab-content">
-          <div className="tab-header">
-            <h2 className="section-title"><BorrowedIcon size={22} style={{ marginRight: '8px', verticalAlign: 'text-bottom', color: '#4f46e5' }} />Borrowed Money</h2>
-            <Link to="/due-tracker/borrowed/add" className="btn btn-primary"><BorrowedIcon />Add Borrowed Money</Link>
-          </div>
-          {renderTable(borrowedMoney, 'borrowed')}
-        </div>
-      )}
+      <div className="tab-content">
+        {activeTab === 'Lent Money' ? renderList(lentMoney, 'lent') : renderList(borrowedMoney, 'borrowed')}
+      </div>
 
       <style>{`
-        .due-tracker-page .page-header {
-          flex-direction: row;
-        }
-
-        .summary-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
+        .due-tracker-page .compact-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+          flex-wrap: wrap;
           gap: 16px;
-          margin-bottom: 32px;
         }
 
-        .summary-card {
+        .summary-bar {
+          display: flex;
           background: #ffffff;
           border: 1px solid #e5e7eb;
           border-radius: 8px;
-          padding: 20px;
-          box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+          margin-bottom: 24px;
+          overflow: hidden;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         }
 
-        .summary-title {
-          font-size: 0.875rem;
-          font-weight: 500;
+        .summary-item {
+          flex: 1;
+          padding: 12px 20px;
+          border-right: 1px solid #e5e7eb;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .summary-item:last-child {
+          border-right: none;
+        }
+
+        .summary-label {
+          font-size: 0.75rem;
+          font-weight: 600;
           color: #6b7280;
-          margin-bottom: 8px;
           text-transform: uppercase;
           letter-spacing: 0.05em;
+          margin-bottom: 4px;
         }
 
-        .summary-value {
-          font-size: 1.5rem;
+        .summary-val {
+          font-size: 1.1rem;
           font-weight: 700;
-          margin: 0;
         }
 
         .text-primary { color: #4f46e5; }
         .text-danger { color: #ef4444; }
 
-        .tabs-container {
+        .compact-tabs {
           display: flex;
           border-bottom: 1px solid #e5e7eb;
-          margin-bottom: 24px;
+          margin-bottom: 16px;
           overflow-x: auto;
         }
 
-        .tab-item {
-          padding: 12px 24px;
+        .compact-tab {
+          padding: 10px 20px;
           font-weight: 500;
-          font-size: 0.95rem;
+          font-size: 0.9rem;
           color: #6b7280;
           cursor: pointer;
           border-bottom: 2px solid transparent;
+          margin-right: 8px;
           white-space: nowrap;
           transition: all 0.2s;
         }
 
-        .tab-item:hover {
+        .compact-tab:hover {
           color: #374151;
         }
 
-        .tab-item.active {
+        .compact-tab.active {
           color: #4f46e5;
           border-bottom-color: #4f46e5;
         }
 
-        .tab-header {
+        .compact-list {
+          background: #ffffff;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+
+        .list-row {
+          padding: 16px 20px;
+          border-bottom: 1px solid #e5e7eb;
+          transition: background-color 0.15s;
+        }
+        
+        .list-row:hover {
+          background-color: #f9fafb;
+        }
+
+        .list-row:last-child {
+          border-bottom: none;
+        }
+
+        .row-main {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 16px;
           flex-wrap: wrap;
           gap: 16px;
         }
 
-        .section-title {
-          font-size: 1.25rem;
+        .row-info {
+          flex: 1;
+          min-width: 250px;
+        }
+
+        .row-title {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 6px;
+          flex-wrap: wrap;
+        }
+
+        .person-name {
+          font-size: 1rem;
           font-weight: 600;
           color: #111827;
-          margin: 0;
+        }
+
+        .row-amount {
+          font-size: 1rem;
+          font-weight: 600;
+          color: #111827;
         }
 
         .status-badge {
-          display: inline-block;
-          padding: 4px 8px;
+          padding: 2px 8px;
           border-radius: 4px;
-          font-size: 0.75rem;
+          font-size: 0.7rem;
           font-weight: 600;
           text-transform: uppercase;
         }
 
-        .status-badge.paid {
-          background-color: #d1fae5;
-          color: #065f46;
+        .status-badge.paid { background-color: #d1fae5; color: #065f46; }
+        .status-badge.pending { background-color: #fee2e2; color: #991b1b; }
+
+        .row-sub {
+          font-size: 0.85rem;
+          color: #4b5563;
+          margin-bottom: 2px;
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 6px;
         }
 
-        .status-badge.pending {
-          background-color: #fee2e2;
-          color: #991b1b;
+        .dot-separator {
+          color: #d1d5db;
+          font-size: 0.7rem;
         }
 
-        .btn-success {
-          background-color: #10b981;
-          color: white;
+        .row-notes {
+          font-size: 0.85rem;
+          color: #6b7280;
+          margin-top: 4px;
+        }
+
+        .row-actions {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+
+        .action-link {
+          background: none;
           border: none;
+          color: #6b7280;
+          font-size: 0.85rem;
+          font-weight: 500;
+          cursor: pointer;
+          padding: 0;
+          transition: color 0.15s;
+        }
+        
+        .action-link:hover {
+          color: #111827;
+          text-decoration: underline;
         }
 
-        .btn-success:hover {
-          background-color: #059669;
+        .action-link.text-danger:hover {
+          color: #dc2626;
         }
 
-        .desktop-only { display: block; }
-        .mobile-only { display: none; }
+        .action-btn {
+          padding: 6px 12px;
+          border-radius: 4px;
+          font-size: 0.8rem;
+          font-weight: 500;
+          cursor: pointer;
+          border: 1px solid transparent;
+          transition: all 0.15s;
+        }
 
-        @media (max-width: 1024px) {
-          .summary-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
+        .btn-outline {
+          background: #ffffff;
+          border-color: #d1d5db;
+          color: #374151;
+        }
+        
+        .btn-outline:hover {
+          background: #f9fafb;
+          border-color: #9ca3af;
+        }
+
+        .btn-fill {
+          background: #10b981;
+          color: #ffffff;
+        }
+        
+        .btn-fill:hover {
+          background: #059669;
         }
 
         @media (max-width: 768px) {
-          .desktop-only { display: none; }
-          .mobile-only { display: block; }
-          
-          .summary-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .due-tracker-page .page-header {
-            flex-direction: column;
-            align-items: flex-start;
-          }
-
-          .tab-header {
-            flex-direction: column;
-            align-items: stretch;
-          }
-
-          .cards-container {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-          }
-
-          .record-card {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-          }
-
-          .record-card .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-          }
-
-          .record-card .card-title-text {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #111827;
-            margin: 0;
-          }
-
-          .record-card .card-body p {
-            font-size: 0.9rem;
-            color: #4b5563;
-            margin-bottom: 6px;
-          }
-
-          .record-card .card-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 16px;
-            border-top: 1px solid #f3f4f6;
-            padding-top: 12px;
+          .summary-bar {
             flex-wrap: wrap;
+          }
+          
+          .summary-item {
+            flex: 1 1 40%;
+            border-right: none;
+            border-bottom: 1px solid #e5e7eb;
+          }
+          
+          .summary-item:nth-child(2) {
+            border-right: none;
+          }
+          
+          .summary-item:nth-child(3),
+          .summary-item:nth-child(4) {
+            border-bottom: none;
+          }
+          
+          .row-main {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+          
+          .row-actions {
+            width: 100%;
+            justify-content: flex-end;
+            padding-top: 12px;
+            margin-top: 4px;
+            border-top: 1px dashed #e5e7eb;
           }
         }
       `}</style>

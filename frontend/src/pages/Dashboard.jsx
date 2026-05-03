@@ -14,22 +14,18 @@ const isObjectId = (value) => {
   return typeof value === "string" && /^[a-f\d]{24}$/i.test(value);
 };
 
-const getTransactionTitle = (transaction, categories) => {
-  const category = transaction.category;
+const getCategoryName = (category, categories) => {
+  if (!category) return "-";
 
-  if (category && typeof category === "object" && category.name) {
+  if (typeof category === "object" && category.name) {
     return category.name;
   }
 
-  if (category && typeof category === "string") {
+  if (typeof category === "string") {
     const matchedCategory = categories.find(
       (item) => item._id === category || item.id === category
     );
-    if (matchedCategory) return matchedCategory.name;
-  }
-
-  if (transaction.title && !isObjectId(transaction.title)) {
-    return transaction.title;
+    return matchedCategory ? matchedCategory.name : "-";
   }
 
   return "-";
@@ -69,10 +65,20 @@ const Dashboard = () => {
 
   const [allIncome, setAllIncome] = useState([]);
   const [allExpense, setAllExpense] = useState([]);
+  const [allLent, setAllLent] = useState([]);
+  const [allBorrowed, setAllBorrowed] = useState([]);
+  
   const [categories, setCategories] = useState([]);
   const [paymentMethods, setPaymentMethods] = useState([]);
+  
   const [dues, setDues] = useState({ pendingLent: 0, pendingBorrowed: 0 });
-  const [allTimeBalance, setAllTimeBalance] = useState({ totalIncome: 0, totalExpense: 0 });
+  const [allTimeBalance, setAllTimeBalance] = useState({ 
+    totalIncome: 0, 
+    totalExpense: 0, 
+    currentBalance: 0, 
+    pendingLentMoney: 0, 
+    pendingBorrowedMoney: 0 
+  });
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -125,7 +131,9 @@ const Dashboard = () => {
         }
 
         if (lentData.status === 'fulfilled' && lentData.value) {
-          const pendingLent = (Array.isArray(lentData.value) ? lentData.value : (lentData.value.data || []))
+          const lentArray = Array.isArray(lentData.value) ? lentData.value : (lentData.value.data || []);
+          setAllLent(lentArray);
+          const pendingLent = lentArray
             .filter(item => !item.isPaid)
             .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
           setDues(prev => ({ ...prev, pendingLent }));
@@ -135,7 +143,9 @@ const Dashboard = () => {
         }
 
         if (borrowedData.status === 'fulfilled' && borrowedData.value) {
-          const pendingBorrowed = (Array.isArray(borrowedData.value) ? borrowedData.value : (borrowedData.value.data || []))
+          const borrowedArray = Array.isArray(borrowedData.value) ? borrowedData.value : (borrowedData.value.data || []);
+          setAllBorrowed(borrowedArray);
+          const pendingBorrowed = borrowedArray
             .filter(item => !item.isPaid)
             .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
           setDues(prev => ({ ...prev, pendingBorrowed }));
@@ -188,23 +198,75 @@ const Dashboard = () => {
   // Calculations for Selected Month
   const filteredIncome = allIncome.filter(i => isSameMonth(i.date || i.createdAt, selectedMonth));
   const filteredExpense = allExpense.filter(e => isSameMonth(e.date || e.createdAt, selectedMonth));
+  const filteredLent = allLent.filter(l => isSameMonth(l.takenDate || l.createdAt, selectedMonth));
+  const filteredBorrowed = allBorrowed.filter(b => isSameMonth(b.takenDate || b.createdAt, selectedMonth));
 
   const monthTotalIncome = filteredIncome.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
   const monthTotalExpense = filteredExpense.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
   const monthCurrentBalance = monthTotalIncome - monthTotalExpense;
 
-  // Net Savings logic remains based on all-time balance implementation
-  const netSavings = (allTimeBalance.totalIncome || 0) - (allTimeBalance.totalExpense || 0);
+  // Utilize the exact backend properties if they exist, fallback to local dues calculation
+  const displayPendingLent = allTimeBalance.pendingLentMoney !== undefined 
+    ? allTimeBalance.pendingLentMoney 
+    : dues.pendingLent;
+
+  const displayPendingBorrowed = allTimeBalance.pendingBorrowedMoney !== undefined 
+    ? allTimeBalance.pendingBorrowedMoney 
+    : dues.pendingBorrowed;
+
+  const displayOverallBalance = allTimeBalance.currentBalance || 0;
 
   const chartData = [
     { name: 'Income', value: monthTotalIncome, color: '#10b981' },
     { name: 'Expense', value: monthTotalExpense, color: '#ef4444' }
   ].filter(item => item.value > 0);
 
-  const recentTransactions = [
-    ...filteredIncome.map(i => ({ ...i, type: 'income' })),
-    ...filteredExpense.map(e => ({ ...e, type: 'expense' }))
-  ]
+  const combinedTransactions = [
+    ...filteredIncome.map(i => ({ 
+      ...i, 
+      type: 'income', 
+      category: i.category,
+      amount: i.amount,
+      date: i.date || i.createdAt, 
+      createdAt: i.createdAt,
+      paymentMethod: i.paymentMethod,
+      notes: i.description
+    })),
+    ...filteredExpense.map(e => ({ 
+      ...e, 
+      type: 'expense', 
+      category: e.category,
+      amount: e.amount,
+      date: e.date || e.createdAt, 
+      createdAt: e.createdAt,
+      paymentMethod: e.paymentMethod,
+      notes: e.description
+    })),
+    ...filteredLent.map(l => ({ 
+      ...l, 
+      type: 'lent', 
+      category: l.category,
+      amount: l.amount,
+      date: l.takenDate || l.createdAt, 
+      createdAt: l.createdAt,
+      paymentMethod: null,
+      status: l.isPaid ? "Paid" : "Not Paid",
+      notes: l.notes
+    })),
+    ...filteredBorrowed.map(b => ({ 
+      ...b, 
+      type: 'borrowed', 
+      category: b.category,
+      amount: b.amount,
+      date: b.takenDate || b.createdAt, 
+      createdAt: b.createdAt,
+      paymentMethod: null,
+      status: b.isPaid ? "Paid" : "Not Paid",
+      notes: b.notes
+    }))
+  ];
+
+  const recentTransactions = combinedTransactions
     .sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date))
     .slice(0, 10);
 
@@ -257,23 +319,23 @@ const Dashboard = () => {
           {/* Summary Cards */}
           <div className="summary-grid">
             <div className="summary-card">
-              <div className="card-title">Current Balance</div>
-              <div className="card-amount" style={{ color: monthCurrentBalance < 0 ? '#ef4444' : '#4f46e5' }}>
-                {monthCurrentBalance < 0 ? '-' : ''}{formatAmount(monthCurrentBalance)}
+              <div className="card-title">Current Balance (Overall)</div>
+              <div className="card-amount" style={{ color: displayOverallBalance < 0 ? '#ef4444' : '#4f46e5' }}>
+                {displayOverallBalance < 0 ? '-' : ''}{formatAmount(displayOverallBalance)}
               </div>
             </div>
             <div className="summary-card">
-              <div className="card-title">Total Income</div>
+              <div className="card-title">Monthly Income</div>
               <div className="card-amount" style={{ color: '#10b981' }}>{formatAmount(monthTotalIncome)}</div>
             </div>
             <div className="summary-card">
-              <div className="card-title">Total Expense</div>
+              <div className="card-title">Monthly Expense</div>
               <div className="card-amount" style={{ color: '#ef4444' }}>{formatAmount(monthTotalExpense)}</div>
             </div>
             <div className="summary-card">
-              <div className="card-title">Net Savings (All-Time)</div>
-              <div className="card-amount" style={{ color: netSavings < 0 ? '#ef4444' : '#10b981' }}>
-                {netSavings < 0 ? '-' : ''}{formatAmount(netSavings)}
+              <div className="card-title">Monthly Balance</div>
+              <div className="card-amount" style={{ color: monthCurrentBalance < 0 ? '#ef4444' : '#10b981' }}>
+                {monthCurrentBalance < 0 ? '-' : ''}{formatAmount(monthCurrentBalance)}
               </div>
             </div>
           </div>
@@ -307,12 +369,12 @@ const Dashboard = () => {
               <div className="due-summary-container">
                 <div className="due-item">
                   <div className="due-label">Pending Lent Money</div>
-                  <div className="due-amount" style={{ color: '#059669' }}>{formatAmount(dues.pendingLent)}</div>
+                  <div className="due-amount" style={{ color: '#059669' }}>{formatAmount(displayPendingLent)}</div>
                   <Link to="/due-tracker/lent/add" className="btn btn-secondary btn-sm" style={{ marginTop: '12px', display: 'inline-block' }}>+ Add Lent Money</Link>
                 </div>
                 <div className="due-item">
                   <div className="due-label">Pending Borrowed Money</div>
-                  <div className="due-amount" style={{ color: '#dc2626' }}>{formatAmount(dues.pendingBorrowed)}</div>
+                  <div className="due-amount" style={{ color: '#dc2626' }}>{formatAmount(displayPendingBorrowed)}</div>
                   <Link to="/due-tracker/borrowed/add" className="btn btn-secondary btn-sm" style={{ marginTop: '12px', display: 'inline-block' }}>+ Add Borrowed Money</Link>
                 </div>
               </div>
@@ -329,9 +391,9 @@ const Dashboard = () => {
                 <table className="data-table">
                   <thead>
                     <tr>
-                      <th>Title / Category</th>
+                      <th>Category</th>
                       <th>Type</th>
-                      <th>Payment Method</th>
+                      <th>Payment Method / Status</th>
                       <th>Date</th>
                       <th style={{ textAlign: 'right' }}>Amount</th>
                     </tr>
@@ -339,15 +401,57 @@ const Dashboard = () => {
                   <tbody>
                     {recentTransactions.map(t => {
                       const isIncome = t.type === 'income';
-                      const title = getTransactionTitle(t, categories);
-                      const paymentMethodName = getPaymentMethodName(t.paymentMethod, paymentMethods);
+                      const isExpense = t.type === 'expense';
+                      const isLent = t.type === 'lent';
+                      const isBorrowed = t.type === 'borrowed';
+                      
+                      const categoryDisplay = getCategoryName(t.category, categories);
+
+                      let typeBadgeColor = "";
+                      let typeBadgeBg = "";
+                      let typeBadgeLabel = "";
+                      let amountColor = "";
+                      let amountSign = "";
+
+                      if (isIncome) {
+                        typeBadgeLabel = 'Income';
+                        typeBadgeBg = '#d1fae5';
+                        typeBadgeColor = '#065f46';
+                        amountColor = '#10b981';
+                        amountSign = '+';
+                      } else if (isExpense) {
+                        typeBadgeLabel = 'Expense';
+                        typeBadgeBg = '#fee2e2';
+                        typeBadgeColor = '#991b1b';
+                        amountColor = '#ef4444';
+                        amountSign = '-';
+                      } else if (isLent) {
+                        typeBadgeLabel = 'Lent';
+                        typeBadgeBg = '#fef3c7'; // yellow
+                        typeBadgeColor = '#92400e';
+                        amountColor = '#ef4444'; // negative
+                        amountSign = '-';
+                      } else if (isBorrowed) {
+                        typeBadgeLabel = 'Borrowed';
+                        typeBadgeBg = '#e0e7ff'; // indigo
+                        typeBadgeColor = '#3730a3';
+                        amountColor = '#10b981'; // positive
+                        amountSign = '+';
+                      }
+
+                      let pmDisplay = "-";
+                      if (isIncome || isExpense) {
+                        pmDisplay = getPaymentMethodName(t.paymentMethod, paymentMethods);
+                      } else {
+                        pmDisplay = t.status;
+                      }
+
                       return (
                         <tr key={t._id}>
                           <td>
                             <div style={{ fontWeight: 500, color: '#111827' }}>
-                              {title}
+                              {categoryDisplay}
                             </div>
-                            {t.notes && <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>{t.notes}</div>}
                           </td>
                           <td>
                             <span style={{ 
@@ -355,16 +459,16 @@ const Dashboard = () => {
                               borderRadius: '4px', 
                               fontSize: '0.75rem', 
                               fontWeight: 600,
-                              backgroundColor: isIncome ? '#d1fae5' : '#fee2e2',
-                              color: isIncome ? '#065f46' : '#991b1b'
+                              backgroundColor: typeBadgeBg,
+                              color: typeBadgeColor
                             }}>
-                              {isIncome ? 'Income' : 'Expense'}
+                              {typeBadgeLabel}
                             </span>
                           </td>
-                          <td>{paymentMethodName}</td>
+                          <td>{pmDisplay}</td>
                           <td>{formatDate(t.date || t.createdAt)}</td>
-                          <td style={{ textAlign: 'right', fontWeight: '600', color: isIncome ? '#10b981' : '#ef4444' }}>
-                            {isIncome ? '+' : '-'} {formatAmount(t.amount)}
+                          <td style={{ textAlign: 'right', fontWeight: '600', color: amountColor }}>
+                            {amountSign} {formatAmount(t.amount)}
                           </td>
                         </tr>
                       );

@@ -1,5 +1,7 @@
 const Income = require("../models/incomeModel");
 const Expense = require("../models/expenseModel");
+const LentMoney = require("../models/lentMoneyModel");
+const BorrowedMoney = require("../models/borrowedMoneyModel");
 const Balance = require("../models/balanceModel");
 
 const getAllIncome = () => {
@@ -8,6 +10,14 @@ const getAllIncome = () => {
 
 const getAllExpense = () => {
   return Expense.find();
+};
+
+const getAllLentMoney = () => {
+  return LentMoney.find();
+};
+
+const getAllBorrowedMoney = () => {
+  return BorrowedMoney.find();
 };
 
 const createBalanceSnapshot = (data) => {
@@ -21,6 +31,8 @@ const getLatestBalanceSnapshot = () => {
 module.exports = {
   getAllIncome,
   getAllExpense,
+  getAllLentMoney,
+  getAllBorrowedMoney,
   createBalanceSnapshot,
   getLatestBalanceSnapshot,
 };
