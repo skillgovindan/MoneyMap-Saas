@@ -1,6 +1,6 @@
 import lentMoneyRepository from '../repositories/lentMoneyRepository';
 
-const createLentMoney = async (data) => {
+export const createLentMoney = async (data) => {
   try {
     if (!data.person || data.amount === undefined || !data.takenDate) {
       throw new Error("person, amount, and takenDate are required");
@@ -14,7 +14,7 @@ const createLentMoney = async (data) => {
   }
 };
 
-const getAllLentMoney = async () => {
+export const getAllLentMoney = async () => {
   try {
     return await lentMoneyRepository.getAllLentMoney();
   } catch (error) {
@@ -22,7 +22,7 @@ const getAllLentMoney = async () => {
   }
 };
 
-const getLentMoneyById = async (id) => {
+export const getLentMoneyById = async (id) => {
   try {
     if (!id) throw new Error("id is required");
     return await lentMoneyRepository.getLentMoneyById(id);
@@ -31,7 +31,7 @@ const getLentMoneyById = async (id) => {
   }
 };
 
-const updateLentMoneyById = async (id, data) => {
+export const updateLentMoney = async (id, data) => {
   try {
     if (!id || !data.person || data.amount === undefined || !data.takenDate) {
       throw new Error("id, person, amount, and takenDate are required");
@@ -39,38 +39,46 @@ const updateLentMoneyById = async (id, data) => {
     if (data.amount <= 0) {
       throw new Error("amount must be greater than 0");
     }
-    return await lentMoneyRepository.updateLentMoneyById(id, data);
+    return await lentMoneyRepository.updateLentMoney(id, data);
   } catch (error) {
     throw new Error(error.response?.data?.message || error.message || "Failed to update lent money record");
   }
 };
 
-const patchLentMoneyById = async (id, data) => {
+export const patchLentMoney = async (id, data) => {
   try {
     if (!id) throw new Error("id is required");
     if (data.amount !== undefined && data.amount <= 0) {
       throw new Error("amount must be greater than 0");
     }
-    return await lentMoneyRepository.patchLentMoneyById(id, data);
+    return await lentMoneyRepository.patchLentMoney(id, data);
   } catch (error) {
     throw new Error(error.response?.data?.message || error.message || "Failed to patch lent money record");
   }
 };
 
-const deleteLentMoneyById = async (id) => {
+export const deleteLentMoney = async (id) => {
   try {
     if (!id) throw new Error("id is required");
-    return await lentMoneyRepository.deleteLentMoneyById(id);
+    return await lentMoneyRepository.deleteLentMoney(id);
   } catch (error) {
     throw new Error(error.response?.data?.message || error.message || "Failed to delete lent money record");
   }
 };
 
+// Aliases for backwards compatibility
+export const updateLentMoneyById = updateLentMoney;
+export const patchLentMoneyById = patchLentMoney;
+export const deleteLentMoneyById = deleteLentMoney;
+
 export default {
   createLentMoney,
   getAllLentMoney,
   getLentMoneyById,
+  updateLentMoney,
+  patchLentMoney,
+  deleteLentMoney,
   updateLentMoneyById,
   patchLentMoneyById,
-  deleteLentMoneyById,
+  deleteLentMoneyById
 };

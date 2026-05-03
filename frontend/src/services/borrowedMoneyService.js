@@ -1,6 +1,6 @@
 import borrowedMoneyRepository from '../repositories/borrowedMoneyRepository';
 
-const createBorrowedMoney = async (data) => {
+export const createBorrowedMoney = async (data) => {
   try {
     if (!data.person || data.amount === undefined || !data.takenDate) {
       throw new Error("person, amount, and takenDate are required");
@@ -14,7 +14,7 @@ const createBorrowedMoney = async (data) => {
   }
 };
 
-const getAllBorrowedMoney = async () => {
+export const getAllBorrowedMoney = async () => {
   try {
     return await borrowedMoneyRepository.getAllBorrowedMoney();
   } catch (error) {
@@ -22,7 +22,7 @@ const getAllBorrowedMoney = async () => {
   }
 };
 
-const getBorrowedMoneyById = async (id) => {
+export const getBorrowedMoneyById = async (id) => {
   try {
     if (!id) throw new Error("id is required");
     return await borrowedMoneyRepository.getBorrowedMoneyById(id);
@@ -31,7 +31,7 @@ const getBorrowedMoneyById = async (id) => {
   }
 };
 
-const updateBorrowedMoneyById = async (id, data) => {
+export const updateBorrowedMoney = async (id, data) => {
   try {
     if (!id || !data.person || data.amount === undefined || !data.takenDate) {
       throw new Error("id, person, amount, and takenDate are required");
@@ -39,38 +39,46 @@ const updateBorrowedMoneyById = async (id, data) => {
     if (data.amount <= 0) {
       throw new Error("amount must be greater than 0");
     }
-    return await borrowedMoneyRepository.updateBorrowedMoneyById(id, data);
+    return await borrowedMoneyRepository.updateBorrowedMoney(id, data);
   } catch (error) {
     throw new Error(error.response?.data?.message || error.message || "Failed to update borrowed money record");
   }
 };
 
-const patchBorrowedMoneyById = async (id, data) => {
+export const patchBorrowedMoney = async (id, data) => {
   try {
     if (!id) throw new Error("id is required");
     if (data.amount !== undefined && data.amount <= 0) {
       throw new Error("amount must be greater than 0");
     }
-    return await borrowedMoneyRepository.patchBorrowedMoneyById(id, data);
+    return await borrowedMoneyRepository.patchBorrowedMoney(id, data);
   } catch (error) {
     throw new Error(error.response?.data?.message || error.message || "Failed to patch borrowed money record");
   }
 };
 
-const deleteBorrowedMoneyById = async (id) => {
+export const deleteBorrowedMoney = async (id) => {
   try {
     if (!id) throw new Error("id is required");
-    return await borrowedMoneyRepository.deleteBorrowedMoneyById(id);
+    return await borrowedMoneyRepository.deleteBorrowedMoney(id);
   } catch (error) {
     throw new Error(error.response?.data?.message || error.message || "Failed to delete borrowed money record");
   }
 };
 
+// Aliases for backwards compatibility
+export const updateBorrowedMoneyById = updateBorrowedMoney;
+export const patchBorrowedMoneyById = patchBorrowedMoney;
+export const deleteBorrowedMoneyById = deleteBorrowedMoney;
+
 export default {
   createBorrowedMoney,
   getAllBorrowedMoney,
   getBorrowedMoneyById,
+  updateBorrowedMoney,
+  patchBorrowedMoney,
+  deleteBorrowedMoney,
   updateBorrowedMoneyById,
   patchBorrowedMoneyById,
-  deleteBorrowedMoneyById,
+  deleteBorrowedMoneyById
 };
