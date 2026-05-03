@@ -275,3 +275,224 @@ body {
   border-radius: 6px;
   margin-bottom: 16px;
 }
+
+/* Sidebar Overrides for Collapse/Expand & Mobile */
+:root {
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 72px;
+  --sidebar-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  transition: width var(--sidebar-transition), transform var(--sidebar-transition);
+  z-index: 100;
+  overflow-x: hidden;
+}
+
+.sidebar.collapsed {
+  width: var(--sidebar-collapsed-width);
+}
+
+.sidebar-header {
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.sidebar.collapsed .sidebar-header {
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.sidebar-title {
+  white-space: nowrap;
+}
+
+.sidebar-title-short {
+  font-weight: 800;
+  color: #4f46e5;
+  font-size: 1.25rem;
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-title-short {
+  display: block;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 6px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.toggle-btn:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.mobile-only-btn {
+  display: none;
+}
+
+.nav-section-title {
+  white-space: nowrap;
+  transition: opacity var(--sidebar-transition);
+}
+
+.sidebar.collapsed .nav-section-title {
+  opacity: 0;
+  pointer-events: none;
+  height: 0;
+  margin: 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 20px;
+  white-space: nowrap;
+  position: relative;
+}
+
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 12px 0;
+}
+
+.nav-item.active {
+  background-color: #eef2ff;
+  color: #4f46e5;
+  border-right: 3px solid #4f46e5;
+}
+
+.sidebar.collapsed .nav-item.active {
+  border-right: none;
+  border-left: 3px solid #4f46e5;
+}
+
+.nav-text {
+  transition: opacity var(--sidebar-transition);
+}
+
+.sidebar.collapsed .nav-text {
+  opacity: 0;
+  width: 0;
+  display: none;
+}
+
+/* Tooltip */
+.sidebar.collapsed .nav-item:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 4px;
+  background: #1f2937;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.main-content {
+  margin-left: var(--sidebar-width);
+  transition: margin-left var(--sidebar-transition);
+  min-width: 0;
+}
+
+.app-container.sidebar-collapsed .main-content {
+  margin-left: var(--sidebar-collapsed-width);
+}
+
+.mobile-header {
+  display: none;
+  align-items: center;
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.mobile-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  margin-right: 16px;
+}
+
+.mobile-header-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 90;
+  backdrop-filter: blur(2px);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    width: 260px !important;
+  }
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+  .sidebar.mobile-open .nav-text {
+    display: block;
+    opacity: 1;
+  }
+  .sidebar.mobile-open .nav-section-title {
+    opacity: 1;
+    height: auto;
+    margin-bottom: 8px;
+  }
+  .sidebar.mobile-open .sidebar-title-short {
+    display: none;
+  }
+  .sidebar.mobile-open .sidebar-title {
+    display: block;
+  }
+  .mobile-only-btn {
+    display: flex;
+  }
+  .desktop-only {
+    display: none !important;
+  }
+  .main-content {
+    margin-left: 0 !important;
+    padding: 20px;
+  }
+  .app-container.sidebar-collapsed .main-content {
+    margin-left: 0 !important;
+  }
+  .mobile-header {
+    display: flex;
+  }
+  .mobile-overlay {
+    display: block;
+  }
+}
