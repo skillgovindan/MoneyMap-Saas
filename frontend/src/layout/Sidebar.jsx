@@ -1,6 +1,5 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import authService from '../services/authService';
+import { NavLink } from 'react-router-dom';
 
 const IconDashboard = () => <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>;
 const IconIncome = () => <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>;
@@ -15,99 +14,89 @@ const IconDueTracker = () => <svg width="20" height="20" fill="none" stroke="cur
 const IconCategories = () => <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82zM7 7h.01"/></svg>;
 const IconMenu = () => <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>;
 const IconX = () => <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
-const IconLogout = () => <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>;
+
+const AppLogo = () => (
+  <div className="sidebar-logo-icon">
+    M
+  </div>
+);
 
 const Sidebar = ({ isCollapsed, toggleCollapse, isMobileOpen, closeMobile }) => {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    authService.logout();
-    navigate('/login');
-  };
-
   return (
     <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''} ${isMobileOpen ? 'mobile-open' : ''}`}>
       <div className="sidebar-header">
-        {!isCollapsed && <div className="sidebar-title">MoneyMap SaaS</div>}
-        {isCollapsed && <div className="sidebar-title-short">MM</div>}
-        <button className="toggle-btn desktop-only" onClick={toggleCollapse}>
+        {!isCollapsed && (
+          <div className="sidebar-brand">
+            <AppLogo />
+            <div className="sidebar-title">MoneyMap</div>
+          </div>
+        )}
+        <button className="toggle-btn desktop-only" onClick={(e) => { e.stopPropagation(); toggleCollapse(); }} title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
           <IconMenu />
         </button>
-        <button className="toggle-btn mobile-only-btn" onClick={closeMobile}>
+        <button className="toggle-btn mobile-only-btn" onClick={(e) => { e.stopPropagation(); closeMobile(); }}>
           <IconX />
         </button>
       </div>
       <nav className="sidebar-nav">
-        <div className="nav-section">
-          <NavLink to="/dashboard" title="Dashboard" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            <IconDashboard />
-            <span className="nav-text">Dashboard</span>
-          </NavLink>
-        </div>
+          <div className="nav-section">
+            <NavLink to="/dashboard" title="Dashboard" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+              <IconDashboard />
+              <span className="nav-text">Dashboard</span>
+            </NavLink>
+          </div>
 
-        <div className="nav-section">
-          <div className="nav-section-title">Transactions</div>
-          <NavLink to="/transactions/income" title="Income" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            <IconIncome />
-            <span className="nav-text">Income</span>
-          </NavLink>
-          <NavLink to="/transactions/expense" title="Expense" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            <IconExpense />
-            <span className="nav-text">Expense</span>
-          </NavLink>
-          <NavLink to="/transactions/history" title="Transaction History" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            <IconHistory />
-            <span className="nav-text">Transaction History</span>
-          </NavLink>
-        </div>
+          <div className="nav-section">
+            <div className="nav-section-title">Transactions</div>
+            <NavLink to="/transactions/income" title="Income" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+              <IconIncome />
+              <span className="nav-text">Income</span>
+            </NavLink>
+            <NavLink to="/transactions/expense" title="Expense" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+              <IconExpense />
+              <span className="nav-text">Expense</span>
+            </NavLink>
+            <NavLink to="/transactions/history" title="Transaction History" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+              <IconHistory />
+              <span className="nav-text">Transaction History</span>
+            </NavLink>
+          </div>
 
-        <div className="nav-section">
-          <div className="nav-section-title">Reports</div>
-          <NavLink to="/reports/daily" title="Daily Report" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            <IconDaily />
-            <span className="nav-text">Daily Report</span>
-          </NavLink>
-          <NavLink to="/reports/weekly" title="Weekly Report" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            <IconWeekly />
-            <span className="nav-text">Weekly Report</span>
-          </NavLink>
-          <NavLink to="/reports/monthly" title="Monthly Report" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            <IconMonthly />
-            <span className="nav-text">Monthly Report</span>
-          </NavLink>
-          <NavLink to="/reports/yearly" title="Yearly Report" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            <IconYearly />
-            <span className="nav-text">Yearly Report</span>
-          </NavLink>
-        </div>
+          <div className="nav-section">
+            <div className="nav-section-title">Reports</div>
+            <NavLink to="/reports/daily" title="Daily Report" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+              <IconDaily />
+              <span className="nav-text">Daily Report</span>
+            </NavLink>
+            <NavLink to="/reports/weekly" title="Weekly Report" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+              <IconWeekly />
+              <span className="nav-text">Weekly Report</span>
+            </NavLink>
+            <NavLink to="/reports/monthly" title="Monthly Report" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+              <IconMonthly />
+              <span className="nav-text">Monthly Report</span>
+            </NavLink>
+            <NavLink to="/reports/yearly" title="Yearly Report" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+              <IconYearly />
+              <span className="nav-text">Yearly Report</span>
+            </NavLink>
+          </div>
 
-        <div className="nav-section">
-          <div className="nav-section-title">Management</div>
-          <NavLink to="/persons" title="Persons" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            <IconPersons />
-            <span className="nav-text">Persons</span>
-          </NavLink>
-          <NavLink to="/due-tracker" title="Due Tracker" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            <IconDueTracker />
-            <span className="nav-text">Due Tracker</span>
-          </NavLink>
-          <NavLink to="/categories" title="Categories" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            <IconCategories />
-            <span className="nav-text">Categories</span>
-          </NavLink>
-        </div>
-
-        <div className="nav-section" style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid #e5e7eb' }}>
-          <button
-            className="nav-item"
-            onClick={handleLogout}
-            title="Logout"
-            style={{ width: '100%', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', color: '#dc2626' }}
-          >
-            <IconLogout />
-            <span className="nav-text">Logout</span>
-          </button>
-        </div>
+          <div className="nav-section">
+            <div className="nav-section-title">Management</div>
+            <NavLink to="/persons" title="Persons" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+              <IconPersons />
+              <span className="nav-text">Persons</span>
+            </NavLink>
+            <NavLink to="/due-tracker" title="Due Tracker" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+              <IconDueTracker />
+              <span className="nav-text">Due Tracker</span>
+            </NavLink>
+            <NavLink to="/categories" title="Categories" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+              <IconCategories />
+              <span className="nav-text">Categories</span>
+            </NavLink>
+          </div>
       </nav>
     </aside>
   );
