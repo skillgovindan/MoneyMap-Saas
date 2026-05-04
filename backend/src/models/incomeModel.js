@@ -10,10 +10,11 @@ const incomeSchema = new mongoose.Schema(
     paymentMethod: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "PaymentMethod",
-      required: false
+      required: false,
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Income", incomeSchema);
+// Export only the schema — model is created per-tenant in the repository
+module.exports = incomeSchema;

@@ -1,6 +1,10 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './layout/MainLayout';
+import ProtectedRoute from './components/ProtectedRoute';
+
+import Login from './pages/Login';
+import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Income from './pages/Income';
 import IncomeForm from './pages/IncomeForm';
@@ -13,17 +17,29 @@ import MonthlyReport from './pages/MonthlyReport';
 import YearlyReport from './pages/YearlyReport';
 import Categories from './pages/Categories';
 import Persons from './pages/Persons';
-
 import DueTracker from './pages/DueTracker';
 import LentMoneyForm from './pages/LentMoneyForm';
 import BorrowedMoneyForm from './pages/BorrowedMoneyForm';
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        {/* Redirect root to dashboard */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        
-        <Route element={<MainLayout />}>
+
+        {/* Protected routes */}
+        <Route
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="transactions/income" element={<Income />} />
           <Route path="transactions/income/add" element={<IncomeForm />} />
@@ -38,7 +54,6 @@ function App() {
           <Route path="reports/yearly" element={<YearlyReport />} />
           <Route path="categories" element={<Categories />} />
           <Route path="persons" element={<Persons />} />
-
           <Route path="due-tracker" element={<DueTracker />} />
           <Route path="due-tracker/lent/add" element={<LentMoneyForm />} />
           <Route path="due-tracker/lent/edit/:id" element={<LentMoneyForm />} />

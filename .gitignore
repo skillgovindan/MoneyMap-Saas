@@ -11,6 +11,10 @@ backend/.env
 frontend/node_modules/
 frontend/.env
 
+auth-backend/node_modules/
+auth-backend/.env
+
 dist/
 build/
 .DS_Store
+*.log
