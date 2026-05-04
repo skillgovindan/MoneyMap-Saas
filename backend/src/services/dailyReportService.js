@@ -1,47 +1,36 @@
 const dailyReportRepository = require("../repositories/dailyReportRepository");
 
-const generateDailyReport = async (dateParam) => {
+const getDailyReport = async (tenantDb, dateStr) => {
   try {
-    if (!dateParam) {
-      throw new Error("Missing required query param: date");
+    if (!dateStr) {
+      throw new Error("date parameter is required (YYYY-MM-DD)");
     }
-    const reportDate = new Date(dateParam);
-    if (isNaN(reportDate.getTime())) {
-      throw new Error("Invalid date provided");
-    }
-
-    const startDate = new Date(reportDate);
-    startDate.setUTCHours(0, 0, 0, 0);
-
-    const endDate = new Date(reportDate);
-    endDate.setUTCHours(23, 59, 59, 999);
-
-    const incomes = await dailyReportRepository.getIncomeByDateRange(startDate, endDate);
+    
+    const startDate = new Date(dateStr);
+    startDate.setHours(0, 0, 0, 0);
+    
+    const endDate = new Date(dateStr);
+    endDate.setHours(23, 59, 59, 999);
+    
+    const incomes = await dailyReportRepository.getIncomeByDateRange(tenantDb, startDate, endDate);
     const expenses = await dailyReportRepository.getExpenseByDateRange(startDate, endDate);
-
+    
     const totalIncome = incomes.reduce((sum, item) => sum + item.amount, 0);
     const totalExpense = expenses.reduce((sum, item) => sum + item.amount, 0);
-    const balance = totalIncome - totalExpense;
-    const incomeCount = incomes.length;
-    const expenseCount = expenses.length;
-
-    const reportData = {
-      startDate,
-      endDate,
+    
+    return {
+      reportType: "daily",
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
       totalIncome,
       totalExpense,
-      balance,
-      incomeCount,
-      expenseCount,
-      reportDate
+      balance: totalIncome - totalExpense,
+      incomeCount: incomes.length,
+      expenseCount: expenses.length
     };
-
-    return await dailyReportRepository.createDailyReport(reportData);
   } catch (error) {
     throw error;
   }
 };
 
-module.exports = {
-  generateDailyReport
-};
+module.exports = { getDailyReport };

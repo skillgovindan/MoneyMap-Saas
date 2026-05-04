@@ -1,51 +1,36 @@
 const weeklyReportRepository = require("../repositories/weeklyReportRepository");
 
-const generateWeeklyReport = async (startDateParam, endDateParam) => {
+const getWeeklyReport = async (tenantDb, startDateStr, endDateStr) => {
   try {
-    if (!startDateParam || !endDateParam) {
-      throw new Error("Missing required query params: startDate, endDate");
+    if (!startDateStr || !endDateStr) {
+      throw new Error("startDate and endDate parameters are required (YYYY-MM-DD)");
     }
     
-    const weekStartDate = new Date(startDateParam);
-    const weekEndDate = new Date(endDateParam);
+    const startDate = new Date(startDateStr);
+    startDate.setHours(0, 0, 0, 0);
     
-    if (isNaN(weekStartDate.getTime()) || isNaN(weekEndDate.getTime())) {
-      throw new Error("Invalid date provided");
-    }
-
-    const startDate = new Date(weekStartDate);
-    startDate.setUTCHours(0, 0, 0, 0);
-
-    const endDate = new Date(weekEndDate);
-    endDate.setUTCHours(23, 59, 59, 999);
-
-    const incomes = await weeklyReportRepository.getIncomeByDateRange(startDate, endDate);
+    const endDate = new Date(endDateStr);
+    endDate.setHours(23, 59, 59, 999);
+    
+    const incomes = await weeklyReportRepository.getIncomeByDateRange(tenantDb, startDate, endDate);
     const expenses = await weeklyReportRepository.getExpenseByDateRange(startDate, endDate);
-
+    
     const totalIncome = incomes.reduce((sum, item) => sum + item.amount, 0);
     const totalExpense = expenses.reduce((sum, item) => sum + item.amount, 0);
-    const balance = totalIncome - totalExpense;
-    const incomeCount = incomes.length;
-    const expenseCount = expenses.length;
-
-    const reportData = {
-      startDate,
-      endDate,
+    
+    return {
+      reportType: "weekly",
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
       totalIncome,
       totalExpense,
-      balance,
-      incomeCount,
-      expenseCount,
-      weekStartDate: startDate,
-      weekEndDate: endDate
+      balance: totalIncome - totalExpense,
+      incomeCount: incomes.length,
+      expenseCount: expenses.length
     };
-
-    return await weeklyReportRepository.createWeeklyReport(reportData);
   } catch (error) {
     throw error;
   }
 };
 
-module.exports = {
-  generateWeeklyReport
-};
+module.exports = { getWeeklyReport };

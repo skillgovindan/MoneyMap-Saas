@@ -34,15 +34,15 @@ app.use(express.json());
 // Public auth routes
 app.use("/api/auth", authRoutes);
 
-// ── Protected + Tenant-aware route (Income only for now) ──────────────────────
+// ── Protected + Tenant-aware routes ──────────────────────────────────────────
 app.use("/api/income", protect, tenantMiddleware, incomeRoutes);
+app.use("/api/reports/daily", protect, tenantMiddleware, dailyReportRoutes);
+app.use("/api/reports/weekly", protect, tenantMiddleware, weeklyReportRoutes);
+app.use("/api/reports/monthly", protect, tenantMiddleware, monthlyReportRoutes);
+app.use("/api/reports/yearly", protect, tenantMiddleware, yearlyReportRoutes);
 
 // ── Remaining routes (not yet tenant-scoped) ─────────────────────────────────
 app.use("/api/expense", expenseRoutes);
-app.use("/api/reports/daily", dailyReportRoutes);
-app.use("/api/reports/weekly", weeklyReportRoutes);
-app.use("/api/reports/monthly", monthlyReportRoutes);
-app.use("/api/reports/yearly", yearlyReportRoutes);
 app.use("/api/balance", balanceRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/transactions", transactionRoutes);
