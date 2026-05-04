@@ -30,13 +30,12 @@ const Login = () => {
   return (
     <div className="auth-container">
       <div className="page-container auth-card">
-        <div className="auth-header">
-          <div className="auth-brand">MoneyMap SaaS</div>
-          <h1 className="auth-title">Welcome Back</h1>
-          <p className="auth-subtitle">Login to continue to MoneyMap SaaS</p>
+        <div className="auth-header" style={{ marginBottom: '24px' }}>
+          <h1 className="auth-brand" style={{ fontSize: '1.85rem', fontWeight: '700', letterSpacing: '-0.03em', marginBottom: '8px' }}>MoneyMap</h1>
+          <p className="auth-subtitle" style={{ fontSize: '0.95rem' }}>Sign in to your account</p>
         </div>
 
-        {error && <div className="error-state">{error}</div>}
+        {error && <div className="error-state" style={{ padding: '10px 14px', fontSize: '0.875rem' }}>{error}</div>}
 
         <form onSubmit={handleSubmit} style={{ textAlign: 'left' }}>
           <div className="form-group">
@@ -81,9 +80,6 @@ const Login = () => {
           <p>
             Don't have an account?{' '}
             <Link to="/register" className="auth-link">Register here</Link>
-          </p>
-          <p style={{ marginTop: '16px', fontSize: '11px', color: '#9ca3af' }}>
-            Secure finance tracking
           </p>
         </div>
       </div>
