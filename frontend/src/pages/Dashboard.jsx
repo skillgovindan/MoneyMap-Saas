@@ -16,35 +16,21 @@ const isObjectId = (value) => {
 
 const getCategoryName = (category, categories) => {
   if (!category) return "-";
-
-  if (typeof category === "object" && category.name) {
-    return category.name;
-  }
-
+  if (typeof category === "object" && category.name) return category.name;
   if (typeof category === "string") {
-    const matchedCategory = categories.find(
-      (item) => item._id === category || item.id === category
-    );
+    const matchedCategory = categories.find(item => item._id === category || item.id === category);
     return matchedCategory ? matchedCategory.name : "-";
   }
-
   return "-";
 };
 
 const getPaymentMethodName = (paymentMethod, paymentMethods) => {
   if (!paymentMethod) return "-";
-
-  if (typeof paymentMethod === "object" && paymentMethod.name) {
-    return paymentMethod.name;
-  }
-
+  if (typeof paymentMethod === "object" && paymentMethod.name) return paymentMethod.name;
   if (typeof paymentMethod === "string") {
-    const matchedPaymentMethod = paymentMethods.find(
-      (item) => item._id === paymentMethod || item.id === paymentMethod
-    );
+    const matchedPaymentMethod = paymentMethods.find(item => item._id === paymentMethod || item.id === paymentMethod);
     return matchedPaymentMethod ? matchedPaymentMethod.name : "-";
   }
-
   return "-";
 };
 
@@ -55,6 +41,17 @@ const isSameMonth = (dateValue, selectedMonthDate) => {
     recordDate.getMonth() === selectedMonthDate.getMonth() &&
     recordDate.getFullYear() === selectedMonthDate.getFullYear()
   );
+};
+
+const normalizeArray = (response) => {
+  if (Array.isArray(response)) return response;
+  if (response && Array.isArray(response.data)) return response.data;
+  if (response && Array.isArray(response.records)) return response.records;
+  return [];
+};
+
+const isNotPaid = (item) => {
+  return item.isPaid === false || item.isPaid === "false" || item.isPaid === undefined || item.isPaid === null;
 };
 
 const Dashboard = () => {
@@ -71,13 +68,11 @@ const Dashboard = () => {
   const [categories, setCategories] = useState([]);
   const [paymentMethods, setPaymentMethods] = useState([]);
   
-  const [dues, setDues] = useState({ pendingLent: 0, pendingBorrowed: 0 });
-  const [allTimeBalance, setAllTimeBalance] = useState({ 
-    totalIncome: 0, 
-    totalExpense: 0, 
-    currentBalance: 0, 
-    pendingLentMoney: 0, 
-    pendingBorrowedMoney: 0 
+  // Dashboard calculation states
+  const [dashboardStats, setDashboardStats] = useState({
+    pendingLentMoney: 0,
+    pendingBorrowedMoney: 0,
+    currentBalance: 0
   });
 
   useEffect(() => {
@@ -91,74 +86,57 @@ const Dashboard = () => {
           lentData,
           borrowedData,
           categoriesData,
-          paymentMethodsData,
-          balanceData
+          paymentMethodsData
         ] = await Promise.allSettled([
           incomeService.getAllIncome(),
           expenseService.getAllExpense(),
           lentMoneyService.getAllLentMoney(),
           borrowedMoneyService.getAllBorrowedMoney(),
           categoryService.getAllCategories(),
-          paymentMethodService.getAllPaymentMethods(),
-          balanceService.getBalance()
+          paymentMethodService.getAllPaymentMethods()
         ]);
 
-        if (incomeData.status === 'rejected') {
-          throw new Error(incomeData.reason?.message || "Failed to load income data");
-        }
-        if (expenseData.status === 'rejected') {
-          throw new Error(expenseData.reason?.message || "Failed to load expense data");
-        }
+        if (incomeData.status === 'rejected') throw new Error(incomeData.reason?.message || "Failed to load income data");
+        if (expenseData.status === 'rejected') throw new Error(expenseData.reason?.message || "Failed to load expense data");
 
-        if (incomeData.status === 'fulfilled' && incomeData.value) {
-          setAllIncome(Array.isArray(incomeData.value) ? incomeData.value : (incomeData.value.data || []));
-        }
+        const normalizedIncome = incomeData.status === 'fulfilled' ? normalizeArray(incomeData.value) : [];
+        const normalizedExpense = expenseData.status === 'fulfilled' ? normalizeArray(expenseData.value) : [];
+        const normalizedLent = lentData.status === 'fulfilled' ? normalizeArray(lentData.value) : [];
+        const normalizedBorrowed = borrowedData.status === 'fulfilled' ? normalizeArray(borrowedData.value) : [];
+        
+        const normalizedCategories = categoriesData.status === 'fulfilled' ? normalizeArray(categoriesData.value) : [];
+        const normalizedPaymentMethods = paymentMethodsData.status === 'fulfilled' ? normalizeArray(paymentMethodsData.value) : [];
 
-        if (expenseData.status === 'fulfilled' && expenseData.value) {
-          setAllExpense(Array.isArray(expenseData.value) ? expenseData.value : (expenseData.value.data || []));
-        }
+        setAllIncome(normalizedIncome);
+        setAllExpense(normalizedExpense);
+        setAllLent(normalizedLent);
+        setAllBorrowed(normalizedBorrowed);
+        setCategories(normalizedCategories);
+        setPaymentMethods(normalizedPaymentMethods);
 
-        if (categoriesData.status === 'fulfilled' && categoriesData.value) {
-          setCategories(Array.isArray(categoriesData.value) ? categoriesData.value : (categoriesData.value.data || []));
-        } else if (categoriesData.status === 'rejected') {
-          console.warn("Categories API failed:", categoriesData.reason);
-        }
+        // 1. Calculate All-time Income & Expense
+        const totalIncome = normalizedIncome.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+        const totalExpense = normalizedExpense.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
 
-        if (paymentMethodsData.status === 'fulfilled' && paymentMethodsData.value) {
-          setPaymentMethods(Array.isArray(paymentMethodsData.value) ? paymentMethodsData.value : (paymentMethodsData.value.data || []));
-        } else if (paymentMethodsData.status === 'rejected') {
-          console.warn("Payment Methods API failed:", paymentMethodsData.reason);
-        }
+        // 2. Calculate Pending Dues
+        const pendingLent = normalizedLent
+          .filter(isNotPaid)
+          .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
 
-        if (lentData.status === 'fulfilled' && lentData.value) {
-          const lentArray = Array.isArray(lentData.value) ? lentData.value : (lentData.value.data || []);
-          setAllLent(lentArray);
-          const pendingLent = lentArray
-            .filter(item => !item.isPaid)
-            .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-          setDues(prev => ({ ...prev, pendingLent }));
-        } else if (lentData.status === 'rejected') {
-          console.warn("Lent Money API failed:", lentData.reason);
-          setDues(prev => ({ ...prev, pendingLent: 0 }));
-        }
+        const pendingBorrowed = normalizedBorrowed
+          .filter(isNotPaid)
+          .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
 
-        if (borrowedData.status === 'fulfilled' && borrowedData.value) {
-          const borrowedArray = Array.isArray(borrowedData.value) ? borrowedData.value : (borrowedData.value.data || []);
-          setAllBorrowed(borrowedArray);
-          const pendingBorrowed = borrowedArray
-            .filter(item => !item.isPaid)
-            .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-          setDues(prev => ({ ...prev, pendingBorrowed }));
-        } else if (borrowedData.status === 'rejected') {
-          console.warn("Borrowed Money API failed:", borrowedData.reason);
-          setDues(prev => ({ ...prev, pendingBorrowed: 0 }));
-        }
+        // 3. Calculate Overall Current Balance
+        // Lent Money decreases balance because money went out.
+        // Borrowed Money increases balance because money came in.
+        const currentBalance = totalIncome - totalExpense - pendingLent + pendingBorrowed;
 
-        if (balanceData.status === 'fulfilled' && balanceData.value) {
-          setAllTimeBalance(balanceData.value);
-        } else if (balanceData.status === 'rejected') {
-          console.warn("Balance API failed:", balanceData.reason);
-        }
+        setDashboardStats({
+          pendingLentMoney: pendingLent,
+          pendingBorrowedMoney: pendingBorrowed,
+          currentBalance: currentBalance
+        });
 
       } catch (err) {
         console.error("Dashboard load error:", err);
@@ -205,17 +183,6 @@ const Dashboard = () => {
   const monthTotalExpense = filteredExpense.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
   const monthCurrentBalance = monthTotalIncome - monthTotalExpense;
 
-  // Utilize the exact backend properties if they exist, fallback to local dues calculation
-  const displayPendingLent = allTimeBalance.pendingLentMoney !== undefined 
-    ? allTimeBalance.pendingLentMoney 
-    : dues.pendingLent;
-
-  const displayPendingBorrowed = allTimeBalance.pendingBorrowedMoney !== undefined 
-    ? allTimeBalance.pendingBorrowedMoney 
-    : dues.pendingBorrowed;
-
-  const displayOverallBalance = allTimeBalance.currentBalance || 0;
-
   const chartData = [
     { name: 'Income', value: monthTotalIncome, color: '#10b981' },
     { name: 'Expense', value: monthTotalExpense, color: '#ef4444' }
@@ -245,29 +212,29 @@ const Dashboard = () => {
     ...filteredLent.map(l => ({ 
       ...l, 
       type: 'lent', 
-      category: l.category,
+      category: "Lent Money",
       amount: l.amount,
       date: l.takenDate || l.createdAt, 
       createdAt: l.createdAt,
       paymentMethod: null,
-      status: l.isPaid ? "Paid" : "Not Paid",
+      status: isNotPaid(l) ? "Not Paid" : "Paid",
       notes: l.notes
     })),
     ...filteredBorrowed.map(b => ({ 
       ...b, 
       type: 'borrowed', 
-      category: b.category,
+      category: "Borrowed Money",
       amount: b.amount,
       date: b.takenDate || b.createdAt, 
       createdAt: b.createdAt,
       paymentMethod: null,
-      status: b.isPaid ? "Paid" : "Not Paid",
+      status: isNotPaid(b) ? "Not Paid" : "Paid",
       notes: b.notes
     }))
   ];
 
   const recentTransactions = combinedTransactions
-    .sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date))
+    .sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt))
     .slice(0, 10);
 
   const formatAmount = (amount) => {
@@ -320,8 +287,8 @@ const Dashboard = () => {
           <div className="summary-grid">
             <div className="summary-card">
               <div className="card-title">Current Balance (Overall)</div>
-              <div className="card-amount" style={{ color: displayOverallBalance < 0 ? '#ef4444' : '#4f46e5' }}>
-                {displayOverallBalance < 0 ? '-' : ''}{formatAmount(displayOverallBalance)}
+              <div className="card-amount" style={{ color: dashboardStats.currentBalance < 0 ? '#ef4444' : '#4f46e5' }}>
+                {dashboardStats.currentBalance < 0 ? '-' : ''}{formatAmount(dashboardStats.currentBalance)}
               </div>
             </div>
             <div className="summary-card">
@@ -369,12 +336,12 @@ const Dashboard = () => {
               <div className="due-summary-container">
                 <div className="due-item">
                   <div className="due-label">Pending Lent Money</div>
-                  <div className="due-amount" style={{ color: '#059669' }}>{formatAmount(displayPendingLent)}</div>
+                  <div className="due-amount" style={{ color: '#059669' }}>{formatAmount(dashboardStats.pendingLentMoney)}</div>
                   <Link to="/due-tracker/lent/add" className="btn btn-secondary btn-sm" style={{ marginTop: '12px', display: 'inline-block' }}>+ Add Lent Money</Link>
                 </div>
                 <div className="due-item">
                   <div className="due-label">Pending Borrowed Money</div>
-                  <div className="due-amount" style={{ color: '#dc2626' }}>{formatAmount(displayPendingBorrowed)}</div>
+                  <div className="due-amount" style={{ color: '#dc2626' }}>{formatAmount(dashboardStats.pendingBorrowedMoney)}</div>
                   <Link to="/due-tracker/borrowed/add" className="btn btn-secondary btn-sm" style={{ marginTop: '12px', display: 'inline-block' }}>+ Add Borrowed Money</Link>
                 </div>
               </div>
@@ -399,13 +366,18 @@ const Dashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {recentTransactions.map(t => {
+                    {recentTransactions.map((t, i) => {
                       const isIncome = t.type === 'income';
                       const isExpense = t.type === 'expense';
                       const isLent = t.type === 'lent';
                       const isBorrowed = t.type === 'borrowed';
                       
-                      const categoryDisplay = getCategoryName(t.category, categories);
+                      let categoryDisplay = "-";
+                      if (isIncome || isExpense) {
+                        categoryDisplay = getCategoryName(t.category, categories);
+                      } else {
+                        categoryDisplay = t.category; // "Lent Money" or "Borrowed Money"
+                      }
 
                       let typeBadgeColor = "";
                       let typeBadgeBg = "";
@@ -429,13 +401,13 @@ const Dashboard = () => {
                         typeBadgeLabel = 'Lent';
                         typeBadgeBg = '#fef3c7'; // yellow
                         typeBadgeColor = '#92400e';
-                        amountColor = '#ef4444'; // negative
+                        amountColor = '#ef4444'; // money went out
                         amountSign = '-';
                       } else if (isBorrowed) {
                         typeBadgeLabel = 'Borrowed';
                         typeBadgeBg = '#e0e7ff'; // indigo
                         typeBadgeColor = '#3730a3';
-                        amountColor = '#10b981'; // positive
+                        amountColor = '#10b981'; // money came in
                         amountSign = '+';
                       }
 
@@ -446,8 +418,9 @@ const Dashboard = () => {
                         pmDisplay = t.status;
                       }
 
+                      // Use index as fallback key since _id might clash across collections
                       return (
-                        <tr key={t._id}>
+                        <tr key={t._id || `fallback-${i}`}>
                           <td>
                             <div style={{ fontWeight: 500, color: '#111827' }}>
                               {categoryDisplay}
@@ -465,8 +438,15 @@ const Dashboard = () => {
                               {typeBadgeLabel}
                             </span>
                           </td>
-                          <td>{pmDisplay}</td>
-                          <td>{formatDate(t.date || t.createdAt)}</td>
+                          <td>
+                            <span style={{
+                              color: t.status === "Not Paid" ? "#dc2626" : (t.status === "Paid" ? "#059669" : "inherit"),
+                              fontWeight: t.status === "Not Paid" || t.status === "Paid" ? 600 : 400
+                            }}>
+                              {pmDisplay}
+                            </span>
+                          </td>
+                          <td>{formatDate(t.date)}</td>
                           <td style={{ textAlign: 'right', fontWeight: '600', color: amountColor }}>
                             {amountSign} {formatAmount(t.amount)}
                           </td>
@@ -482,140 +462,25 @@ const Dashboard = () => {
       )}
 
       <style>{`
-        .dashboard-container {
-          width: 100%;
-        }
-
-        .month-selector {
-          display: flex;
-          align-items: center;
-          background: #f3f4f6;
-          border-radius: 8px;
-          padding: 6px;
-        }
-
-        .month-btn {
-          background: transparent;
-          border: none;
-          padding: 6px 12px;
-          font-weight: 500;
-          color: #4b5563;
-          border-radius: 4px;
-          cursor: pointer;
-          transition: background 0.2s;
-        }
-
-        .month-btn:hover:not(:disabled) {
-          background: #e5e7eb;
-          color: #111827;
-        }
-
-        .month-display {
-          font-weight: 600;
-          color: #111827;
-          margin: 0 16px;
-          min-width: 120px;
-          text-align: center;
-        }
-
-        .quick-actions {
-          display: flex;
-          gap: 12px;
-        }
-
-        .summary-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 20px;
-          margin-bottom: 24px;
-        }
-
-        .summary-card {
-          background: #ffffff;
-          border-radius: 8px;
-          padding: 24px;
-          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-          border: 1px solid #f3f4f6;
-        }
-
-        .summary-card .card-title {
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: #6b7280;
-          margin-bottom: 8px;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        }
-
-        .summary-card .card-amount {
-          font-size: 1.7rem;
-          font-weight: 700;
-        }
-
-        .dashboard-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 24px;
-          margin-bottom: 24px;
-        }
-
-        .dashboard-card {
-          background: #ffffff;
-          border-radius: 8px;
-          padding: 24px;
-          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-          border: 1px solid #f3f4f6;
-        }
-
-        .section-title {
-          font-size: 1.1rem;
-          font-weight: 600;
-          color: #111827;
-          margin-bottom: 20px;
-        }
-
-        .due-summary-container {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-
-        .due-item {
-          background: #f9fafb;
-          border: 1px solid #e5e7eb;
-          padding: 16px;
-          border-radius: 8px;
-        }
-
-        .due-label {
-          font-size: 0.9rem;
-          font-weight: 600;
-          color: #4b5563;
-          margin-bottom: 8px;
-        }
-
-        .due-amount {
-          font-size: 1.5rem;
-          font-weight: 700;
-        }
-
-        @media (max-width: 1024px) {
-          .summary-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-          .dashboard-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        @media (max-width: 640px) {
-          .summary-grid {
-            grid-template-columns: 1fr;
-          }
-          .desktop-only {
-            display: none;
-          }
-        }
+        .dashboard-container { width: 100%; }
+        .month-selector { display: flex; align-items: center; background: #f3f4f6; border-radius: 8px; padding: 6px; }
+        .month-btn { background: transparent; border: none; padding: 6px 12px; font-weight: 500; color: #4b5563; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
+        .month-btn:hover:not(:disabled) { background: #e5e7eb; color: #111827; }
+        .month-display { font-weight: 600; color: #111827; margin: 0 16px; min-width: 120px; text-align: center; }
+        .quick-actions { display: flex; gap: 12px; }
+        .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 24px; }
+        .summary-card { background: #ffffff; border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); border: 1px solid #f3f4f6; }
+        .summary-card .card-title { font-size: 0.85rem; font-weight: 600; color: #6b7280; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .summary-card .card-amount { font-size: 1.7rem; font-weight: 700; }
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .dashboard-card { background: #ffffff; border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); border: 1px solid #f3f4f6; }
+        .section-title { font-size: 1.1rem; font-weight: 600; color: #111827; margin-bottom: 20px; }
+        .due-summary-container { display: flex; flex-direction: column; gap: 16px; }
+        .due-item { background: #f9fafb; border: 1px solid #e5e7eb; padding: 16px; border-radius: 8px; }
+        .due-label { font-size: 0.9rem; font-weight: 600; color: #4b5563; margin-bottom: 8px; }
+        .due-amount { font-size: 1.5rem; font-weight: 700; }
+        @media (max-width: 1024px) { .summary-grid { grid-template-columns: repeat(2, 1fr); } .dashboard-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 640px) { .summary-grid { grid-template-columns: 1fr; } .desktop-only { display: none; } }
       `}</style>
     </div>
   );
