@@ -120,13 +120,13 @@ const TransactionHistory = () => {
         <p style={{ color: '#6b7280', margin: '4px 0 0 0' }}>View all your past incomes and expenses</p>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '24px', flexWrap: 'wrap', backgroundColor: '#f9fafb', padding: '16px', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '24px', flexWrap: 'wrap', backgroundColor: 'var(--bg-card)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', gap: '8px' }}>
           {['All', 'Income', 'Expense'].map(f => (
             <button
               key={f}
               className={`btn ${typeFilter === f ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ borderRadius: '20px', padding: '6px 16px', fontWeight: '500', transition: 'all 0.2s', ...( typeFilter === f ? { backgroundColor: '#4f46e5', color: '#fff', border: 'none' } : { backgroundColor: '#e5e7eb', color: '#374151', border: 'none' } ) }}
+              style={{ borderRadius: '20px', padding: '6px 16px', fontWeight: '500', transition: 'all 0.2s', ...( typeFilter === f ? { backgroundColor: 'var(--primary)', color: 'var(--bg-card)', border: 'none' } : { backgroundColor: 'var(--bg-hover)', color: 'var(--text-primary)', border: '1px solid var(--border)' } ) }}
               onClick={() => setTypeFilter(f)}
             >
               {f}
@@ -138,12 +138,12 @@ const TransactionHistory = () => {
           <button 
             className={`btn ${!selectedDate ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setSelectedDate('')}
-            style={{ padding: '6px 16px', borderRadius: '20px', fontWeight: '500', transition: 'all 0.2s', ...( !selectedDate ? { backgroundColor: '#4f46e5', color: '#fff', border: 'none' } : { backgroundColor: '#e5e7eb', color: '#374151', border: 'none' } ) }}
+            style={{ padding: '6px 16px', borderRadius: '20px', fontWeight: '500', transition: 'all 0.2s', ...( !selectedDate ? { backgroundColor: 'var(--primary)', color: 'var(--bg-card)', border: 'none' } : { backgroundColor: 'var(--bg-hover)', color: 'var(--text-primary)', border: '1px solid var(--border)' } ) }}
           >
             All Dates
           </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <label htmlFor="filterDate" style={{ fontWeight: '500', color: '#374151' }}>Date:</label>
+            <label htmlFor="filterDate" style={{ fontWeight: '500', color: 'var(--text-primary)' }}>Date:</label>
             <input
               type="date"
               id="filterDate"
@@ -151,7 +151,7 @@ const TransactionHistory = () => {
               value={selectedDate}
               max={new Date().toISOString().split('T')[0]}
               onChange={(e) => setSelectedDate(e.target.value)}
-              style={{ width: 'auto', borderRadius: '8px', cursor: 'pointer', border: '1px solid #d1d5db', padding: '6px 12px' }}
+              style={{ width: 'auto', borderRadius: '8px', cursor: 'pointer', border: '1px solid var(--border)', padding: '6px 12px' }}
             />
           </div>
         </div>
@@ -164,9 +164,8 @@ const TransactionHistory = () => {
           <div className="loading-state">Loading transactions...</div>
         </div>
       ) : filteredTransactions.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '60px 20px', backgroundColor: '#f9fafb', borderRadius: '16px', border: '2px dashed #e5e7eb' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '16px' }}>📝</div>
-          <h3 style={{ fontSize: '1.25rem', color: '#374151', margin: '0 0 8px 0' }}>
+        <div style={{ textAlign: 'center', padding: '60px 20px', backgroundColor: 'var(--bg-card)', borderRadius: '16px', border: '2px dashed var(--border)' }}>
+          <h3 style={{ fontSize: '1.25rem', color: 'var(--text-primary)', margin: '0 0 8px 0' }}>
             {selectedDate ? 'No records found for this date' : 'No records found'}
           </h3>
           <p style={{ color: '#6b7280' }}>
@@ -183,9 +182,9 @@ const TransactionHistory = () => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 padding: '16px',
-                border: '1px solid #e5e7eb',
+                border: '1px solid var(--border)',
                 borderRadius: '12px',
-                backgroundColor: '#ffffff',
+                backgroundColor: 'var(--bg-card)',
                 boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
               }}
@@ -197,12 +196,12 @@ const TransactionHistory = () => {
                   width: '48px',
                   height: '48px',
                   borderRadius: '50%',
-                  backgroundColor: t.type === 'income' ? '#dcfce7' : '#fee2e2',
+                  backgroundColor: t.type === 'income' ? 'var(--bg-success-light)' : 'var(--bg-danger-light)',
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
                   fontSize: '1.25rem',
-                  color: t.type === 'income' ? '#166534' : '#991b1b',
+                  color: t.type === 'income' ? 'var(--income-color)' : 'var(--expense-color)',
                   flexShrink: 0
                 }}>
                   {t.type === 'income' ? '↓' : '↑'}
@@ -221,7 +220,7 @@ const TransactionHistory = () => {
                     <span style={{ 
                       display: 'inline-block', 
                       padding: '2px 8px', 
-                      backgroundColor: '#f3f4f6', 
+                      backgroundColor: 'var(--border)', 
                       borderRadius: '4px',
                       fontSize: '0.75rem',
                       fontWeight: '500'
@@ -237,7 +236,7 @@ const TransactionHistory = () => {
                 <div style={{ 
                   fontWeight: 700, 
                   fontSize: '1.125rem',
-                  color: t.type === 'income' ? '#10b981' : '#ef4444'
+                  color: t.type === 'income' ? 'var(--income-color)' : 'var(--expense-color)'
                 }}>
                   {t.type === 'income' ? '+' : '-'} ₹{Number(t.amount).toLocaleString('en-IN')}
                 </div>

@@ -140,8 +140,8 @@ const DueTracker = () => {
     
     if (records.length === 0) {
       return (
-        <div className="empty-state" style={{ padding: '32px', textAlign: 'center', background: '#ffffff', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
-          <p style={{ color: '#4b5563', marginBottom: '12px' }}>No {isLent ? 'lent' : 'borrowed'} money records found.</p>
+        <div className="empty-state" style={{ padding: '32px', textAlign: 'center', background: 'var(--bg-card)', borderRadius: '6px', border: '1px solid var(--border)' }}>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '12px' }}>No {isLent ? 'lent' : 'borrowed'} money records found.</p>
           <Link to={`/due-tracker/${isLent ? 'lent' : 'borrowed'}/add`} className="btn btn-primary btn-sm">
             + Add {isLent ? 'Lent' : 'Borrowed'} Money
           </Link>
@@ -260,8 +260,8 @@ const DueTracker = () => {
 
         .summary-bar {
           display: flex;
-          background: #ffffff;
-          border: 1px solid #e5e7eb;
+          background: var(--bg-card);
+          border: 1px solid var(--border);
           border-radius: 8px;
           margin-bottom: 24px;
           overflow: hidden;
@@ -271,7 +271,7 @@ const DueTracker = () => {
         .summary-item {
           flex: 1;
           padding: 12px 20px;
-          border-right: 1px solid #e5e7eb;
+          border-right: 1px solid var(--border);
           display: flex;
           flex-direction: column;
         }
@@ -294,12 +294,12 @@ const DueTracker = () => {
           font-weight: 700;
         }
 
-        .text-primary { color: #4f46e5; }
-        .text-danger { color: #ef4444; }
+        .text-primary { color: #2563eb; }
+        .text-danger { color: #dc2626; }
 
         .compact-tabs {
           display: flex;
-          border-bottom: 1px solid #e5e7eb;
+          border-bottom: 1px solid var(--border);
           margin-bottom: 16px;
           overflow-x: auto;
         }
@@ -321,25 +321,25 @@ const DueTracker = () => {
         }
 
         .compact-tab.active {
-          color: #4f46e5;
-          border-bottom-color: #4f46e5;
+          color: #2563eb;
+          border-bottom-color: #2563eb;
         }
 
         .compact-list {
-          background: #ffffff;
-          border: 1px solid #e5e7eb;
+          background: var(--bg-card);
+          border: 1px solid var(--border);
           border-radius: 8px;
           box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         }
 
         .list-row {
           padding: 16px 20px;
-          border-bottom: 1px solid #e5e7eb;
+          border-bottom: 1px solid var(--border);
           transition: background-color 0.15s;
         }
         
         .list-row:hover {
-          background-color: #f9fafb;
+          background-color: var(--bg-card);
         }
 
         .list-row:last-child {
@@ -401,7 +401,7 @@ const DueTracker = () => {
         }
 
         .dot-separator {
-          color: #d1d5db;
+          color: var(--border);
           font-size: 0.7rem;
         }
 
@@ -448,19 +448,19 @@ const DueTracker = () => {
         }
 
         .btn-outline {
-          background: #ffffff;
-          border-color: #d1d5db;
+          background: var(--bg-card);
+          border-color: var(--border);
           color: #374151;
         }
         
         .btn-outline:hover {
-          background: #f9fafb;
+          background: var(--bg-card);
           border-color: #9ca3af;
         }
 
         .btn-fill {
-          background: #10b981;
-          color: #ffffff;
+          background: #16a34a;
+          color: var(--bg-card);
         }
         
         .btn-fill:hover {
@@ -475,7 +475,7 @@ const DueTracker = () => {
           .summary-item {
             flex: 1 1 40%;
             border-right: none;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid var(--border);
           }
           
           .summary-item:nth-child(2) {
@@ -497,7 +497,7 @@ const DueTracker = () => {
             justify-content: flex-end;
             padding-top: 12px;
             margin-top: 4px;
-            border-top: 1px dashed #e5e7eb;
+            border-top: 1px dashed var(--border);
           }
         }
       `}</style>

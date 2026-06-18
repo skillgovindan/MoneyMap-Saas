@@ -183,9 +183,34 @@ const Dashboard = () => {
   const monthTotalExpense = filteredExpense.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
   const monthCurrentBalance = monthTotalIncome - monthTotalExpense;
 
+  const getInsights = () => {
+    const insightsList = [];
+    const savingsRate = monthTotalIncome > 0 ? (monthCurrentBalance / monthTotalIncome) * 100 : 0;
+
+    if (monthTotalExpense > monthTotalIncome && monthTotalIncome > 0) {
+      insightsList.push({ id: 1, type: 'warning', text: 'You have spent more than you earned this month. Consider reviewing your recent expenses.', color: 'var(--expense-color)', bg: 'var(--bg-danger-light)', border: 'var(--expense-color)' });
+    } else if (savingsRate >= 20) {
+      insightsList.push({ id: 2, type: 'success', text: `Great job! You've saved ${savingsRate.toFixed(1)}% of your income this month.`, color: 'var(--income-color)', bg: 'var(--bg-success-light)', border: 'var(--income-color)' });
+    } else if (savingsRate > 0 && savingsRate < 20) {
+      insightsList.push({ id: 3, type: 'info', text: `You've saved ${savingsRate.toFixed(1)}% of your income. Try aiming for 20% by cutting unnecessary expenses.`, color: 'var(--primary)', bg: '#eff6ff', border: '#bfdbfe' });
+    }
+
+    if (dashboardStats.pendingBorrowedMoney > 0) {
+      insightsList.push({ id: 4, type: 'warning', text: `You have ${formatAmount(dashboardStats.pendingBorrowedMoney)} in outstanding borrowed money. Prioritize paying off debts.`, color: 'var(--expense-color)', bg: 'var(--bg-danger-light)', border: 'var(--expense-color)' });
+    }
+
+    if (insightsList.length === 0) {
+      insightsList.push({ id: 5, type: 'info', text: 'Track more income and expenses to receive personalized financial insights.', color: 'var(--text-secondary)', bg: 'var(--bg-hover)', border: 'var(--border)' });
+    }
+    
+    return insightsList;
+  };
+
+  const insights = getInsights();
+
   const chartData = [
-    { name: 'Income', value: monthTotalIncome, color: '#10b981' },
-    { name: 'Expense', value: monthTotalExpense, color: '#ef4444' }
+    { name: 'Income', value: monthTotalIncome, color: 'var(--income-color)' },
+    { name: 'Expense', value: monthTotalExpense, color: 'var(--expense-color)' }
   ].filter(item => item.value > 0);
 
   const combinedTransactions = [
@@ -272,8 +297,8 @@ const Dashboard = () => {
         </div>
 
         <div className="quick-actions desktop-only">
-          <Link to="/transactions/income/add" className="btn btn-primary" style={{ backgroundColor: '#10b981', border: 'none' }}>+ Add Income</Link>
-          <Link to="/transactions/expense/add" className="btn btn-primary" style={{ backgroundColor: '#ef4444', border: 'none' }}>+ Add Expense</Link>
+          <Link to="/transactions/income/add" className="btn btn-primary" style={{ backgroundColor: 'var(--income-color)', border: 'none' }}>+ Add Income</Link>
+          <Link to="/transactions/expense/add" className="btn btn-primary" style={{ backgroundColor: 'var(--expense-color)', border: 'none' }}>+ Add Expense</Link>
         </div>
       </div>
 
@@ -287,21 +312,21 @@ const Dashboard = () => {
           <div className="summary-grid">
             <div className="summary-card">
               <div className="card-title">Current Balance (Overall)</div>
-              <div className="card-amount" style={{ color: dashboardStats.currentBalance < 0 ? '#ef4444' : '#4f46e5' }}>
+              <div className="card-amount" style={{ color: 'var(--text-primary)' }}>
                 {dashboardStats.currentBalance < 0 ? '-' : ''}{formatAmount(dashboardStats.currentBalance)}
               </div>
             </div>
             <div className="summary-card">
               <div className="card-title">Monthly Income</div>
-              <div className="card-amount" style={{ color: '#10b981' }}>{formatAmount(monthTotalIncome)}</div>
+              <div className="card-amount" style={{ color: 'var(--income-color)' }}>{formatAmount(monthTotalIncome)}</div>
             </div>
             <div className="summary-card">
               <div className="card-title">Monthly Expense</div>
-              <div className="card-amount" style={{ color: '#ef4444' }}>{formatAmount(monthTotalExpense)}</div>
+              <div className="card-amount" style={{ color: 'var(--expense-color)' }}>{formatAmount(monthTotalExpense)}</div>
             </div>
             <div className="summary-card">
               <div className="card-title">Monthly Balance</div>
-              <div className="card-amount" style={{ color: monthCurrentBalance < 0 ? '#ef4444' : '#10b981' }}>
+              <div className="card-amount" style={{ color: 'var(--text-primary)' }}>
                 {monthCurrentBalance < 0 ? '-' : ''}{formatAmount(monthCurrentBalance)}
               </div>
             </div>
@@ -336,15 +361,47 @@ const Dashboard = () => {
               <div className="due-summary-container">
                 <div className="due-item">
                   <div className="due-label">Pending Lent Money</div>
-                  <div className="due-amount" style={{ color: '#059669' }}>{formatAmount(dashboardStats.pendingLentMoney)}</div>
+                  <div className="due-amount" style={{ color: 'var(--income-color)' }}>{formatAmount(dashboardStats.pendingLentMoney)}</div>
                   <Link to="/due-tracker/lent/add" className="btn btn-secondary btn-sm" style={{ marginTop: '12px', display: 'inline-block' }}>+ Add Lent Money</Link>
                 </div>
                 <div className="due-item">
                   <div className="due-label">Pending Borrowed Money</div>
-                  <div className="due-amount" style={{ color: '#dc2626' }}>{formatAmount(dashboardStats.pendingBorrowedMoney)}</div>
+                  <div className="due-amount" style={{ color: 'var(--expense-color)' }}>{formatAmount(dashboardStats.pendingBorrowedMoney)}</div>
                   <Link to="/due-tracker/borrowed/add" className="btn btn-secondary btn-sm" style={{ marginTop: '12px', display: 'inline-block' }}>+ Add Borrowed Money</Link>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Financial Insights */}
+          <div className="dashboard-card insights-card" style={{ marginBottom: '24px' }}>
+            <h2 className="section-title" style={{ marginBottom: '16px' }}>Financial Insights</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {insights.map(insight => (
+                <div key={insight.id} style={{ 
+                  padding: '14px 18px', 
+                  borderRadius: 'var(--radius-sm)', 
+                  backgroundColor: insight.bg, 
+                  color: insight.color, 
+                  fontSize: '0.9rem', 
+                  fontWeight: 500, 
+                  display: 'flex', 
+                  alignItems: 'flex-start', 
+                  gap: '12px', 
+                  border: `1px solid ${insight.border}` 
+                }}>
+                  <span style={{ 
+                    width: '8px', 
+                    height: '8px', 
+                    borderRadius: '50%', 
+                    backgroundColor: insight.color,
+                    display: 'inline-block',
+                    flexShrink: 0,
+                    marginTop: '6px'
+                  }}></span>
+                  <span style={{ lineHeight: 1.5 }}>{insight.text}</span>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -387,27 +444,27 @@ const Dashboard = () => {
 
                       if (isIncome) {
                         typeBadgeLabel = 'Income';
-                        typeBadgeBg = '#d1fae5';
-                        typeBadgeColor = '#065f46';
-                        amountColor = '#10b981';
+                        typeBadgeBg = 'var(--bg-success-light)';
+                        typeBadgeColor = 'var(--income-color)';
+                        amountColor = 'var(--income-color)';
                         amountSign = '+';
                       } else if (isExpense) {
                         typeBadgeLabel = 'Expense';
-                        typeBadgeBg = '#fee2e2';
-                        typeBadgeColor = '#991b1b';
-                        amountColor = '#ef4444';
+                        typeBadgeBg = 'var(--bg-danger-light)';
+                        typeBadgeColor = 'var(--expense-color)';
+                        amountColor = 'var(--expense-color)';
                         amountSign = '-';
                       } else if (isLent) {
                         typeBadgeLabel = 'Lent';
-                        typeBadgeBg = '#fef3c7'; // yellow
-                        typeBadgeColor = '#92400e';
-                        amountColor = '#ef4444'; // money went out
+                        typeBadgeBg = '#f8fafc';
+                        typeBadgeColor = 'var(--text-secondary)';
+                        amountColor = 'var(--expense-color)'; // money went out
                         amountSign = '-';
                       } else if (isBorrowed) {
                         typeBadgeLabel = 'Borrowed';
-                        typeBadgeBg = '#e0e7ff'; // indigo
-                        typeBadgeColor = '#3730a3';
-                        amountColor = '#10b981'; // money came in
+                        typeBadgeBg = '#eff6ff'; // blue
+                        typeBadgeColor = 'var(--primary)';
+                        amountColor = 'var(--income-color)'; // money came in
                         amountSign = '+';
                       }
 
@@ -463,20 +520,20 @@ const Dashboard = () => {
 
       <style>{`
         .dashboard-container { width: 100%; }
-        .month-selector { display: flex; align-items: center; background: #f3f4f6; border-radius: 8px; padding: 6px; }
-        .month-btn { background: transparent; border: none; padding: 6px 12px; font-weight: 500; color: #4b5563; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
-        .month-btn:hover:not(:disabled) { background: #e5e7eb; color: #111827; }
-        .month-display { font-weight: 600; color: #111827; margin: 0 16px; min-width: 120px; text-align: center; }
+        .month-selector { display: flex; align-items: center; background: var(--bg-hover); border-radius: 8px; padding: 6px; border: 1px solid var(--border); }
+        .month-btn { background: transparent; border: none; padding: 6px 12px; font-weight: 500; color: var(--text-secondary); border-radius: 4px; cursor: pointer; transition: background 0.2s; }
+        .month-btn:hover:not(:disabled) { background: var(--border); color: var(--text-primary); }
+        .month-display { font-weight: 600; color: var(--text-primary); margin: 0 16px; min-width: 120px; text-align: center; }
         .quick-actions { display: flex; gap: 12px; }
         .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 24px; }
-        .summary-card { background: #ffffff; border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); border: 1px solid #f3f4f6; }
+        .summary-card { background: var(--bg-card); border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); border: 1px solid var(--border); }
         .summary-card .card-title { font-size: 0.85rem; font-weight: 600; color: #6b7280; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
         .summary-card .card-amount { font-size: 1.7rem; font-weight: 700; }
         .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
-        .dashboard-card { background: #ffffff; border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); border: 1px solid #f3f4f6; }
+        .dashboard-card { background: var(--bg-card); border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); border: 1px solid var(--border); }
         .section-title { font-size: 1.1rem; font-weight: 600; color: #111827; margin-bottom: 20px; }
         .due-summary-container { display: flex; flex-direction: column; gap: 16px; }
-        .due-item { background: #f9fafb; border: 1px solid #e5e7eb; padding: 16px; border-radius: 8px; }
+        .due-item { background: var(--bg-card); border: 1px solid var(--border); padding: 16px; border-radius: 8px; }
         .due-label { font-size: 0.9rem; font-weight: 600; color: #4b5563; margin-bottom: 8px; }
         .due-amount { font-size: 1.5rem; font-weight: 700; }
         @media (max-width: 1024px) { .summary-grid { grid-template-columns: repeat(2, 1fr); } .dashboard-grid { grid-template-columns: 1fr; } }

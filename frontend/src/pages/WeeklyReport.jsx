@@ -85,14 +85,14 @@ const WeeklyReport = () => {
     }
 
     const graphData = [
-      { name: 'Income', amount: reportData.totalIncome, color: '#10b981' },
-      { name: 'Expense', amount: reportData.totalExpense, color: '#ef4444' }
+      { name: 'Income', amount: reportData.totalIncome, color: '#16a34a' },
+      { name: 'Expense', amount: reportData.totalExpense, color: '#dc2626' }
     ];
 
     return (
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', marginTop: '24px' }}>
-        <div style={{ flex: '1 1 500px', minWidth: '300px', height: '400px', backgroundColor: '#fff', padding: '16px', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
-          <h3 style={{ marginBottom: '16px', fontSize: '1.125rem', color: '#374151', fontWeight: '600' }}>Income vs Expense</h3>
+        <div style={{ flex: '1 1 500px', minWidth: '300px', height: '400px', backgroundColor: 'var(--bg-card)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+          <h3 style={{ marginBottom: '16px', fontSize: '1.125rem', color: 'var(--text-primary)', fontWeight: '600' }}>Income vs Expense</h3>
           <ResponsiveContainer width="100%" height="90%">
             <BarChart data={graphData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -108,8 +108,8 @@ const WeeklyReport = () => {
           </ResponsiveContainer>
         </div>
 
-        <div style={{ flex: '0 1 300px', minWidth: '250px', backgroundColor: '#f9fafb', padding: '24px', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
-          <h3 style={{ marginBottom: '20px', fontSize: '1.125rem', color: '#374151', borderBottom: '1px solid #e5e7eb', paddingBottom: '8px', fontWeight: '600' }}>
+        <div style={{ flex: '0 1 300px', minWidth: '250px', backgroundColor: 'var(--bg-card)', padding: '24px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+          <h3 style={{ marginBottom: '20px', fontSize: '1.125rem', color: 'var(--text-primary)', borderBottom: '1px solid var(--border)', paddingBottom: '8px', fontWeight: '600' }}>
             Weekly Summary
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -123,25 +123,25 @@ const WeeklyReport = () => {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: '#6b7280' }}>Total Income:</span>
-              <span style={{ fontWeight: '600', color: '#10b981' }}>{formatCurrency(reportData.totalIncome)}</span>
+              <span style={{ fontWeight: '600', color: '#16a34a' }}>{formatCurrency(reportData.totalIncome)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: '#6b7280' }}>Total Expense:</span>
-              <span style={{ fontWeight: '600', color: '#ef4444' }}>{formatCurrency(reportData.totalExpense)}</span>
+              <span style={{ fontWeight: '600', color: '#dc2626' }}>{formatCurrency(reportData.totalExpense)}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #e5e7eb', paddingTop: '16px' }}>
-              <span style={{ color: '#4b5563', fontWeight: '600' }}>Balance:</span>
-              <span style={{ fontWeight: '700', fontSize: '1.125rem', color: reportData.balance >= 0 ? '#4f46e5' : '#ef4444' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
+              <span style={{ color: 'var(--text-secondary)', fontWeight: '600' }}>Balance:</span>
+              <span style={{ fontWeight: '700', fontSize: '1.125rem', color: reportData.balance >= 0 ? '#2563eb' : '#dc2626' }}>
                 {formatCurrency(reportData.balance)}
               </span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
               <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>Income Count:</span>
-              <span style={{ fontWeight: '500', fontSize: '0.875rem', color: '#374151' }}>{reportData.incomeCount}</span>
+              <span style={{ fontWeight: '500', fontSize: '0.875rem', color: 'var(--text-primary)' }}>{reportData.incomeCount}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>Expense Count:</span>
-              <span style={{ fontWeight: '500', fontSize: '0.875rem', color: '#374151' }}>{reportData.expenseCount}</span>
+              <span style={{ fontWeight: '500', fontSize: '0.875rem', color: 'var(--text-primary)' }}>{reportData.expenseCount}</span>
             </div>
           </div>
         </div>
@@ -159,7 +159,7 @@ const WeeklyReport = () => {
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <label htmlFor="startDate" style={{ fontWeight: '500', color: '#374151' }}>Start Date:</label>
+            <label htmlFor="startDate" style={{ fontWeight: '500', color: 'var(--text-primary)' }}>Start Date:</label>
             <input
               type="date"
               id="startDate"
@@ -171,7 +171,7 @@ const WeeklyReport = () => {
             />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <label htmlFor="endDate" style={{ fontWeight: '500', color: '#374151' }}>End Date:</label>
+            <label htmlFor="endDate" style={{ fontWeight: '500', color: 'var(--text-primary)' }}>End Date:</label>
             <input
               type="date"
               id="endDate"

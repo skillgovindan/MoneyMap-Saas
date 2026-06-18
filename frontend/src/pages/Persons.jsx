@@ -263,8 +263,8 @@ const Persons = () => {
           }
 
           .person-card {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 8px;
             padding: 16px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
@@ -288,7 +288,7 @@ const Persons = () => {
             justify-content: flex-end;
             gap: 8px;
             margin-top: 16px;
-            border-top: 1px solid #f3f4f6;
+            border-top: 1px solid var(--border);
             padding-top: 12px;
           }
         }

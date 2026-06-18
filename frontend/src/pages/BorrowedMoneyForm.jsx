@@ -29,7 +29,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, renderOption, ren
   return (
     <div ref={containerRef} style={{ position: 'relative', width: '100%' }}>
       <div 
-        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', backgroundColor: '#fff', border: '1px solid #d1d5db', borderRadius: '4px', padding: '0.5rem 0.75rem', minHeight: '40px' }}
+        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '4px', padding: '0.5rem 0.75rem', minHeight: '40px' }}
         onClick={() => setIsOpen(!isOpen)}
       >
         <span style={{ color: selectedOption ? '#111827' : '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -50,7 +50,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, renderOption, ren
       </div>
       
       {isOpen && (
-        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, backgroundColor: '#fff', border: '1px solid #d1d5db', borderRadius: '4px', marginTop: '4px', zIndex: 50, maxHeight: '200px', overflowY: 'auto', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
+        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '4px', marginTop: '4px', zIndex: 50, maxHeight: '200px', overflowY: 'auto', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
           {options.length === 0 ? (
             <div style={{ padding: '8px 12px', color: '#6b7280', fontSize: '0.9rem' }}>No options available</div>
           ) : (
@@ -58,9 +58,9 @@ const CustomSelect = ({ value, onChange, options, placeholder, renderOption, ren
               <div 
                 key={option._id}
                 onClick={() => { onChange(option._id); setIsOpen(false); }}
-                style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #f3f4f6', fontSize: '0.95rem', color: '#111827' }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#fff'}
+                style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid var(--border)', fontSize: '0.95rem', color: '#111827' }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--bg-card)'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--bg-card)'}
               >
                 {renderOption(option)}
               </div>
@@ -349,7 +349,7 @@ const BorrowedMoneyForm = () => {
 
       <style>{`
         .form-card {
-          background: #ffffff;
+          background: var(--bg-card);
           border-radius: 8px;
           padding: 24px;
           box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
@@ -386,7 +386,7 @@ const BorrowedMoneyForm = () => {
           justify-content: flex-end;
           gap: 12px;
           margin-top: 32px;
-          border-top: 1px solid #e5e7eb;
+          border-top: 1px solid var(--border);
           padding-top: 24px;
         }
 

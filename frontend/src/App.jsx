@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './layout/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute';
+import { ThemeProvider } from './context/ThemeContext';
 
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -23,45 +24,47 @@ import BorrowedMoneyForm from './pages/BorrowedMoneyForm';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+    <ThemeProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
-        {/* Redirect root to dashboard */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          {/* Redirect root to dashboard */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-        {/* Protected routes */}
-        <Route
-          element={
-            <ProtectedRoute>
-              <MainLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="transactions/income" element={<Income />} />
-          <Route path="transactions/income/add" element={<IncomeForm />} />
-          <Route path="transactions/income/edit/:id" element={<IncomeForm />} />
-          <Route path="transactions/expense" element={<Expense />} />
-          <Route path="transactions/expense/add" element={<ExpenseForm />} />
-          <Route path="transactions/expense/edit/:id" element={<ExpenseForm />} />
-          <Route path="transactions/history" element={<TransactionHistory />} />
-          <Route path="reports/daily" element={<DailyReport />} />
-          <Route path="reports/weekly" element={<WeeklyReport />} />
-          <Route path="reports/monthly" element={<MonthlyReport />} />
-          <Route path="reports/yearly" element={<YearlyReport />} />
-          <Route path="categories" element={<Categories />} />
-          <Route path="persons" element={<Persons />} />
-          <Route path="due-tracker" element={<DueTracker />} />
-          <Route path="due-tracker/lent/add" element={<LentMoneyForm />} />
-          <Route path="due-tracker/lent/edit/:id" element={<LentMoneyForm />} />
-          <Route path="due-tracker/borrowed/add" element={<BorrowedMoneyForm />} />
-          <Route path="due-tracker/borrowed/edit/:id" element={<BorrowedMoneyForm />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+          {/* Protected routes */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="transactions/income" element={<Income />} />
+            <Route path="transactions/income/add" element={<IncomeForm />} />
+            <Route path="transactions/income/edit/:id" element={<IncomeForm />} />
+            <Route path="transactions/expense" element={<Expense />} />
+            <Route path="transactions/expense/add" element={<ExpenseForm />} />
+            <Route path="transactions/expense/edit/:id" element={<ExpenseForm />} />
+            <Route path="transactions/history" element={<TransactionHistory />} />
+            <Route path="reports/daily" element={<DailyReport />} />
+            <Route path="reports/weekly" element={<WeeklyReport />} />
+            <Route path="reports/monthly" element={<MonthlyReport />} />
+            <Route path="reports/yearly" element={<YearlyReport />} />
+            <Route path="categories" element={<Categories />} />
+            <Route path="persons" element={<Persons />} />
+            <Route path="due-tracker" element={<DueTracker />} />
+            <Route path="due-tracker/lent/add" element={<LentMoneyForm />} />
+            <Route path="due-tracker/lent/edit/:id" element={<LentMoneyForm />} />
+            <Route path="due-tracker/borrowed/add" element={<BorrowedMoneyForm />} />
+            <Route path="due-tracker/borrowed/edit/:id" element={<BorrowedMoneyForm />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

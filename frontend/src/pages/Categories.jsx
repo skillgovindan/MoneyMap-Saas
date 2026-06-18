@@ -123,14 +123,14 @@ const Categories = () => {
         <button 
           className="btn btn-primary" 
           onClick={handleOpenModal}
-          style={{ padding: '10px 20px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px -1px rgba(79, 70, 229, 0.2)' }}
+          style={{ padding: '10px 20px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: 'var(--shadow-card)', backgroundColor: 'var(--primary)', border: 'none', color: 'var(--bg-card)' }}
         >
           <span style={{ fontSize: '1.2rem' }}>+</span> Add Category
         </button>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', borderBottom: '1px solid #e5e7eb', paddingBottom: '16px', overflowX: 'auto' }}>
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', borderBottom: '1px solid var(--border)', paddingBottom: '16px', overflowX: 'auto' }}>
         {['all', 'income', 'expense'].map((tab) => (
           <button
             key={tab}
@@ -142,8 +142,8 @@ const Categories = () => {
               fontWeight: 600,
               textTransform: 'capitalize',
               cursor: 'pointer',
-              backgroundColor: activeTab === tab ? '#4f46e5' : '#f3f4f6',
-              color: activeTab === tab ? '#ffffff' : '#4b5563',
+              backgroundColor: activeTab === tab ? 'var(--primary)' : 'var(--border)',
+              color: activeTab === tab ? 'var(--bg-card)' : '#4b5563',
               transition: 'all 0.2s ease',
               whiteSpace: 'nowrap'
             }}
@@ -161,9 +161,8 @@ const Categories = () => {
           <div className="loading-state">Loading categories...</div>
         </div>
       ) : filteredCategories.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '60px 20px', backgroundColor: '#f9fafb', borderRadius: '16px', border: '2px dashed #e5e7eb' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '16px' }}>📁</div>
-          <h3 style={{ fontSize: '1.25rem', color: '#374151', margin: '0 0 8px 0' }}>No Categories Found</h3>
+        <div style={{ textAlign: 'center', padding: '60px 20px', backgroundColor: 'var(--bg-card)', borderRadius: '16px', border: '2px dashed var(--border)' }}>
+          <h3 style={{ fontSize: '1.25rem', color: 'var(--text-primary)', margin: '0 0 8px 0' }}>No Categories Found</h3>
           <p style={{ color: '#6b7280', marginBottom: '24px' }}>Get started by creating a new category for your transactions.</p>
           <button className="btn btn-primary" onClick={handleOpenModal}>Create First Category</button>
         </div>
@@ -177,8 +176,8 @@ const Categories = () => {
             <div 
               key={category._id} 
               style={{
-                backgroundColor: '#ffffff',
-                border: '1px solid #f3f4f6',
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--border)',
                 borderRadius: '16px',
                 padding: '20px',
                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
@@ -198,7 +197,7 @@ const Categories = () => {
                 left: 0,
                 width: '100%',
                 height: '4px',
-                backgroundColor: category.type === 'income' ? '#10b981' : '#ef4444'
+                backgroundColor: category.type === 'income' ? 'var(--income-color)' : 'var(--expense-color)'
               }} />
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
@@ -211,8 +210,8 @@ const Categories = () => {
                   fontSize: '0.75rem',
                   fontWeight: 600,
                   textTransform: 'uppercase',
-                  backgroundColor: category.type === 'income' ? '#dcfce7' : '#fee2e2',
-                  color: category.type === 'income' ? '#166534' : '#991b1b',
+                  backgroundColor: category.type === 'income' ? 'var(--bg-success-light)' : 'var(--bg-danger-light)',
+                  color: category.type === 'income' ? 'var(--income-color)' : 'var(--expense-color)',
                   whiteSpace: 'nowrap'
                 }}>
                   {category.type}
@@ -223,22 +222,22 @@ const Categories = () => {
                 {category.description || 'No description provided.'}
               </p>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', paddingTop: '16px', borderTop: '1px solid #f3f4f6' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
                 <button 
                   onClick={() => handleOpenEditModal(category)}
                   style={{
                     padding: '6px 12px',
                     borderRadius: '6px',
-                    border: '1px solid #e5e7eb',
-                    backgroundColor: '#ffffff',
-                    color: '#4b5563',
+                    border: '1px solid var(--border)',
+                    backgroundColor: 'var(--bg-card)',
+                    color: 'var(--text-secondary)',
                     fontWeight: 500,
                     cursor: 'pointer',
                     transition: 'all 0.2s',
                     fontSize: '0.875rem'
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f3f4f6'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--border)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--bg-card)'; }}
                 >
                   Edit
                 </button>
@@ -247,16 +246,16 @@ const Categories = () => {
                   style={{
                     padding: '6px 12px',
                     borderRadius: '6px',
-                    border: '1px solid #fee2e2',
-                    backgroundColor: '#fef2f2',
-                    color: '#dc2626',
+                    border: '1px solid var(--expense-color)',
+                    backgroundColor: 'var(--bg-danger-light)',
+                    color: 'var(--expense-color)',
                     fontWeight: 500,
                     cursor: 'pointer',
                     transition: 'all 0.2s',
                     fontSize: '0.875rem'
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#fee2e2'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#fef2f2'; }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--expense-color)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--bg-danger-light)'; }}
                 >
                   Delete
                 </button>
@@ -286,7 +285,7 @@ const Categories = () => {
             
             <form onSubmit={handleSubmit}>
               <div className="form-group" style={{ marginBottom: '20px' }}>
-                <label className="form-label" style={{ fontWeight: 600, color: '#374151', marginBottom: '8px', display: 'block' }}>Category Name</label>
+                <label className="form-label" style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px', display: 'block' }}>Category Name</label>
                 <input
                   type="text"
                   name="name"
@@ -294,34 +293,34 @@ const Categories = () => {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="e.g. Food, Salary, Rent"
-                  style={{ padding: '12px', borderRadius: '8px', border: '1px solid #d1d5db', width: '100%', boxSizing: 'border-box' }}
+                  style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--border)', width: '100%', boxSizing: 'border-box' }}
                 />
               </div>
 
               <div className="form-group" style={{ marginBottom: '20px' }}>
-                <label className="form-label" style={{ fontWeight: 600, color: '#374151', marginBottom: '8px', display: 'block' }}>Transaction Type</label>
+                <label className="form-label" style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px', display: 'block' }}>Transaction Type</label>
                 <div style={{ display: 'flex', gap: '12px' }}>
                   <label style={{
-                    flex: 1, padding: '12px', border: formData.type === 'expense' ? '2px solid #ef4444' : '1px solid #d1d5db', 
+                    flex: 1, padding: '12px', border: formData.type === 'expense' ? '2px solid var(--expense-color)' : '1px solid var(--border)', 
                     borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
-                    backgroundColor: formData.type === 'expense' ? '#fef2f2' : '#ffffff', transition: 'all 0.2s', boxSizing: 'border-box'
+                    backgroundColor: formData.type === 'expense' ? 'var(--bg-danger-light)' : 'var(--bg-card)', transition: 'all 0.2s', boxSizing: 'border-box'
                   }}>
-                    <input type="radio" name="type" value="expense" checked={formData.type === 'expense'} onChange={handleChange} style={{ accentColor: '#ef4444' }} />
+                    <input type="radio" name="type" value="expense" checked={formData.type === 'expense'} onChange={handleChange} style={{ accentColor: 'var(--expense-color)' }} />
                     <span style={{ fontWeight: formData.type === 'expense' ? 600 : 400, color: '#111827' }}>Expense</span>
                   </label>
                   <label style={{
-                    flex: 1, padding: '12px', border: formData.type === 'income' ? '2px solid #10b981' : '1px solid #d1d5db', 
+                    flex: 1, padding: '12px', border: formData.type === 'income' ? '2px solid var(--income-color)' : '1px solid var(--border)', 
                     borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
-                    backgroundColor: formData.type === 'income' ? '#ecfdf5' : '#ffffff', transition: 'all 0.2s', boxSizing: 'border-box'
+                    backgroundColor: formData.type === 'income' ? 'var(--bg-success-light)' : 'var(--bg-card)', transition: 'all 0.2s', boxSizing: 'border-box'
                   }}>
-                    <input type="radio" name="type" value="income" checked={formData.type === 'income'} onChange={handleChange} style={{ accentColor: '#10b981' }} />
+                    <input type="radio" name="type" value="income" checked={formData.type === 'income'} onChange={handleChange} style={{ accentColor: 'var(--income-color)' }} />
                     <span style={{ fontWeight: formData.type === 'income' ? 600 : 400, color: '#111827' }}>Income</span>
                   </label>
                 </div>
               </div>
 
               <div className="form-group" style={{ marginBottom: '24px' }}>
-                <label className="form-label" style={{ fontWeight: 600, color: '#374151', marginBottom: '8px', display: 'block' }}>Description (Optional)</label>
+                <label className="form-label" style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px', display: 'block' }}>Description (Optional)</label>
                 <textarea
                   name="description"
                   className="form-textarea"
@@ -329,7 +328,7 @@ const Categories = () => {
                   onChange={handleChange}
                   placeholder="What is this category used for?"
                   rows="3"
-                  style={{ padding: '12px', borderRadius: '8px', border: '1px solid #d1d5db', width: '100%', resize: 'vertical', boxSizing: 'border-box' }}
+                  style={{ padding: '12px', borderRadius: '8px', border: '1px solid var(--border)', width: '100%', resize: 'vertical', boxSizing: 'border-box' }}
                 ></textarea>
               </div>
 
@@ -338,7 +337,7 @@ const Categories = () => {
                   type="button" 
                   onClick={handleCloseModal}
                   disabled={isSaving}
-                  style={{ padding: '10px 20px', borderRadius: '8px', border: '1px solid #d1d5db', backgroundColor: '#ffffff', color: '#4b5563', fontWeight: 600, cursor: 'pointer' }}
+                  style={{ padding: '10px 20px', borderRadius: '8px', border: '1px solid var(--border)', backgroundColor: 'var(--bg-card)', color: 'var(--text-secondary)', fontWeight: 600, cursor: 'pointer' }}
                 >
                   Cancel
                 </button>
@@ -346,7 +345,7 @@ const Categories = () => {
                   type="submit" 
                   className="btn btn-primary"
                   disabled={isSaving}
-                  style={{ padding: '10px 24px', borderRadius: '8px', border: 'none', backgroundColor: '#4f46e5', color: '#ffffff', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 6px -1px rgba(79, 70, 229, 0.2)' }}
+                  style={{ padding: '10px 24px', borderRadius: '8px', border: 'none', backgroundColor: 'var(--primary)', color: 'var(--bg-card)', fontWeight: 600, cursor: 'pointer', boxShadow: 'var(--shadow-card)' }}
                 >
                   {isSaving ? 'Saving...' : (isEditing ? 'Save Changes' : 'Create Category')}
                 </button>

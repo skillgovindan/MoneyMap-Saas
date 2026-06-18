@@ -35,7 +35,7 @@ const register = async (data) => {
     return responseData;
   } catch (error) {
     if (!error.response) {
-      throw new Error('Unable to connect to server. Please check if backend is running on port 5000.');
+      throw new Error('Unable to connect to server. Please try again later.');
     }
     throw new Error(error.response.data.message || 'Registration failed');
   }
@@ -50,7 +50,7 @@ const login = async (data) => {
     return responseData;
   } catch (error) {
     if (!error.response) {
-      throw new Error('Unable to connect to server. Please check if backend is running on port 5000.');
+      throw new Error('Unable to connect to server. Please try again later.');
     }
     throw new Error(error.response.data.message || 'Login failed');
   }
