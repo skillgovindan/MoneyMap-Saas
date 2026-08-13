@@ -345,14 +345,14 @@ const Dashboard = () => {
     .sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt))
     .slice(0, 10);
 
-  const formatAmount = (amount) => {
+  function formatAmount(amount) {
     return '₹' + Math.abs(amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  };
+  }
 
-  const formatDate = (dateString) => {
+  function formatDate(dateString) {
     if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  };
+  }
 
   return (
     <div className="dashboard-container">
