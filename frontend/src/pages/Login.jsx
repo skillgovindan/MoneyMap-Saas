@@ -27,12 +27,36 @@ const Login = () => {
     }
   };
 
+  const handleDemoAccess = () => {
+    // Set a demo token so ProtectedRoute allows access without a real account
+    localStorage.setItem('token', 'demo-access-token');
+    localStorage.setItem('user', JSON.stringify({ name: 'Demo User', phoneNumber: 'demo' }));
+    navigate('/dashboard');
+  };
+
   return (
     <div className="auth-container">
       <div className="page-container auth-card">
         <div className="auth-header" style={{ marginBottom: '24px' }}>
           <h1 className="auth-brand" style={{ fontSize: '1.85rem', fontWeight: '700', letterSpacing: '-0.03em', marginBottom: '8px' }}>MoneyMap</h1>
           <p className="auth-subtitle" style={{ fontSize: '0.95rem' }}>Sign in to your account</p>
+        </div>
+
+        {/* Demo Access Banner */}
+        <div className="demo-banner">
+          <p className="demo-banner-text">👋 Recruiter? Explore the app instantly — no sign-up needed.</p>
+          <button
+            id="demo-access-btn"
+            type="button"
+            className="btn demo-btn"
+            onClick={handleDemoAccess}
+          >
+            ✦ Try Demo
+          </button>
+        </div>
+
+        <div className="auth-divider">
+          <span>or sign in with your account</span>
         </div>
 
         {error && <div className="error-state" style={{ padding: '10px 14px', fontSize: '0.875rem' }}>{error}</div>}
