@@ -7,10 +7,54 @@ const apiClient = axios.create({
   },
 });
 
-// Attach JWT token to every request automatically
+// Attach JWT token to every request automatically, or mock network if demo
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  if (token) {
+  
+  if (token === 'demo-access-token') {
+    // Override the adapter for demo mode to mock backend responses
+    config.adapter = function (config) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          let mockData = { success: true, message: "Action successful (Demo Mode)" };
+          
+          if (config.method === 'post' || config.method === 'put' || config.method === 'patch') {
+             try {
+                const body = config.data ? JSON.parse(config.data) : {};
+                mockData = { ...body, _id: "demo_" + Date.now(), id: "demo_" + Date.now() };
+             } catch(e) {
+                mockData = { _id: "demo_" + Date.now(), id: "demo_" + Date.now() };
+             }
+          } else if (config.method === 'get') {
+             mockData = [];
+             if (config.url.includes('category') || config.url.includes('categories')) {
+                mockData = [
+                  { _id: 'c1', name: 'Salary', type: 'income' }, 
+                  { _id: 'c2', name: 'Freelance', type: 'income' },
+                  { _id: 'c3', name: 'Food & Dining', type: 'expense' },
+                  { _id: 'c4', name: 'Transport', type: 'expense' }
+                ];
+             } else if (config.url.includes('payment')) {
+                mockData = [
+                  { _id: 'p1', name: 'UPI' }, 
+                  { _id: 'p2', name: 'Cash' },
+                  { _id: 'p3', name: 'Credit Card' }
+                ];
+             }
+          }
+          
+          resolve({
+            data: mockData,
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config: config,
+            request: {}
+          });
+        }, 500); // simulate realistic network delay
+      });
+    };
+  } else if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
