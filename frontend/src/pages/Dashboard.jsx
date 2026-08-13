@@ -55,49 +55,56 @@ function isNotPaid(item) {
 }
 
 // ── Demo mode constants (module-level, computed once) ────────────────────────
+// ── Demo mode function ────────────────────────────────────────────────────────
 const DEMO_TOKEN = 'demo-access-token';
-const _now = new Date();
-function _daysAgo(days, monthOffset = 0) {
-  const dt = new Date(_now);
-  dt.setMonth(dt.getMonth() + monthOffset);
-  dt.setDate(dt.getDate() - days);
-  return dt.toISOString();
+
+function getDemoData() {
+  const _now = new Date();
+  function _daysAgo(days, monthOffset = 0) {
+    const dt = new Date(_now);
+    dt.setMonth(dt.getMonth() + monthOffset);
+    dt.setDate(dt.getDate() - days);
+    return dt.toISOString();
+  }
+
+  const DEMO_CATEGORIES = [
+    { _id: 'c1', name: 'Salary' }, { _id: 'c2', name: 'Freelance' },
+    { _id: 'c3', name: 'Food & Dining' }, { _id: 'c4', name: 'Transport' },
+    { _id: 'c5', name: 'Shopping' }, { _id: 'c6', name: 'Utilities' },
+    { _id: 'c7', name: 'Entertainment' }, { _id: 'c8', name: 'Healthcare' },
+  ];
+  const DEMO_PAYMENT_METHODS = [
+    { _id: 'p1', name: 'UPI' }, { _id: 'p2', name: 'Cash' },
+    { _id: 'p3', name: 'Credit Card' }, { _id: 'p4', name: 'Net Banking' },
+  ];
+  const DEMO_INCOME = [
+    { _id: 'i1', amount: 65000, category: 'c1', paymentMethod: 'p4', date: _daysAgo(3),       description: 'Monthly salary' },
+    { _id: 'i2', amount: 12000, category: 'c2', paymentMethod: 'p1', date: _daysAgo(10),      description: 'Website project' },
+    { _id: 'i3', amount: 8500,  category: 'c2', paymentMethod: 'p1', date: _daysAgo(18),      description: 'Logo design' },
+    { _id: 'i4', amount: 65000, category: 'c1', paymentMethod: 'p4', date: _daysAgo(3, -1),   description: 'Monthly salary' },
+    { _id: 'i5', amount: 9000,  category: 'c2', paymentMethod: 'p1', date: _daysAgo(12, -1),  description: 'App UI work' },
+  ];
+  const DEMO_EXPENSE = [
+    { _id: 'e1', amount: 4200, category: 'c3', paymentMethod: 'p1', date: _daysAgo(2),       description: 'Groceries & dining out' },
+    { _id: 'e2', amount: 1800, category: 'c4', paymentMethod: 'p2', date: _daysAgo(5),       description: 'Cab & auto rides' },
+    { _id: 'e3', amount: 7500, category: 'c5', paymentMethod: 'p3', date: _daysAgo(8),       description: 'Clothing & accessories' },
+    { _id: 'e4', amount: 2100, category: 'c6', paymentMethod: 'p1', date: _daysAgo(11),      description: 'Electricity & internet' },
+    { _id: 'e5', amount: 1200, category: 'c7', paymentMethod: 'p2', date: _daysAgo(14),      description: 'Movies & OTT subscriptions' },
+    { _id: 'e6', amount: 950,  category: 'c8', paymentMethod: 'p1', date: _daysAgo(20),      description: 'Doctor consultation' },
+    { _id: 'e7', amount: 3800, category: 'c3', paymentMethod: 'p1', date: _daysAgo(4, -1),   description: 'Restaurant & groceries' },
+    { _id: 'e8', amount: 5200, category: 'c5', paymentMethod: 'p3', date: _daysAgo(9, -1),   description: 'Electronics' },
+    { _id: 'e9', amount: 1600, category: 'c4', paymentMethod: 'p2', date: _daysAgo(15, -1),  description: 'Fuel' },
+  ];
+  const DEMO_LENT = [
+    { _id: 'l1', amount: 5000, personName: 'Arjun',   takenDate: _daysAgo(15), isPaid: false, notes: 'Personal loan' },
+    { _id: 'l2', amount: 2000, personName: 'Priya',   takenDate: _daysAgo(30), isPaid: true,  notes: 'Lunch money' },
+  ];
+  const DEMO_BORROWED = [
+    { _id: 'b1', amount: 3000, personName: 'Karthik', takenDate: _daysAgo(20), isPaid: false, notes: 'Emergency cash' },
+  ];
+
+  return { DEMO_CATEGORIES, DEMO_PAYMENT_METHODS, DEMO_INCOME, DEMO_EXPENSE, DEMO_LENT, DEMO_BORROWED };
 }
-const DEMO_CATEGORIES = [
-  { _id: 'c1', name: 'Salary' }, { _id: 'c2', name: 'Freelance' },
-  { _id: 'c3', name: 'Food & Dining' }, { _id: 'c4', name: 'Transport' },
-  { _id: 'c5', name: 'Shopping' }, { _id: 'c6', name: 'Utilities' },
-  { _id: 'c7', name: 'Entertainment' }, { _id: 'c8', name: 'Healthcare' },
-];
-const DEMO_PAYMENT_METHODS = [
-  { _id: 'p1', name: 'UPI' }, { _id: 'p2', name: 'Cash' },
-  { _id: 'p3', name: 'Credit Card' }, { _id: 'p4', name: 'Net Banking' },
-];
-const DEMO_INCOME = [
-  { _id: 'i1', amount: 65000, category: 'c1', paymentMethod: 'p4', date: _daysAgo(3),       description: 'Monthly salary' },
-  { _id: 'i2', amount: 12000, category: 'c2', paymentMethod: 'p1', date: _daysAgo(10),      description: 'Website project' },
-  { _id: 'i3', amount: 8500,  category: 'c2', paymentMethod: 'p1', date: _daysAgo(18),      description: 'Logo design' },
-  { _id: 'i4', amount: 65000, category: 'c1', paymentMethod: 'p4', date: _daysAgo(3, -1),   description: 'Monthly salary' },
-  { _id: 'i5', amount: 9000,  category: 'c2', paymentMethod: 'p1', date: _daysAgo(12, -1),  description: 'App UI work' },
-];
-const DEMO_EXPENSE = [
-  { _id: 'e1', amount: 4200, category: 'c3', paymentMethod: 'p1', date: _daysAgo(2),       description: 'Groceries & dining out' },
-  { _id: 'e2', amount: 1800, category: 'c4', paymentMethod: 'p2', date: _daysAgo(5),       description: 'Cab & auto rides' },
-  { _id: 'e3', amount: 7500, category: 'c5', paymentMethod: 'p3', date: _daysAgo(8),       description: 'Clothing & accessories' },
-  { _id: 'e4', amount: 2100, category: 'c6', paymentMethod: 'p1', date: _daysAgo(11),      description: 'Electricity & internet' },
-  { _id: 'e5', amount: 1200, category: 'c7', paymentMethod: 'p2', date: _daysAgo(14),      description: 'Movies & OTT subscriptions' },
-  { _id: 'e6', amount: 950,  category: 'c8', paymentMethod: 'p1', date: _daysAgo(20),      description: 'Doctor consultation' },
-  { _id: 'e7', amount: 3800, category: 'c3', paymentMethod: 'p1', date: _daysAgo(4, -1),   description: 'Restaurant & groceries' },
-  { _id: 'e8', amount: 5200, category: 'c5', paymentMethod: 'p3', date: _daysAgo(9, -1),   description: 'Electronics' },
-  { _id: 'e9', amount: 1600, category: 'c4', paymentMethod: 'p2', date: _daysAgo(15, -1),  description: 'Fuel' },
-];
-const DEMO_LENT = [
-  { _id: 'l1', amount: 5000, personName: 'Arjun',   takenDate: _daysAgo(15), isPaid: false, notes: 'Personal loan' },
-  { _id: 'l2', amount: 2000, personName: 'Priya',   takenDate: _daysAgo(30), isPaid: true,  notes: 'Lunch money' },
-];
-const DEMO_BORROWED = [
-  { _id: 'b1', amount: 3000, personName: 'Karthik', takenDate: _daysAgo(20), isPaid: false, notes: 'Emergency cash' },
-];
 // ─────────────────────────────────────────────────────────────────────────────
 
 const Dashboard = () => {
@@ -130,22 +137,24 @@ const Dashboard = () => {
 
       // ── DEMO MODE: skip API, load mock data ────────────────────────────
       if (isDemo) {
-        setAllIncome(DEMO_INCOME);
-        setAllExpense(DEMO_EXPENSE);
-        setAllLent(DEMO_LENT);
-        setAllBorrowed(DEMO_BORROWED);
-        setCategories(DEMO_CATEGORIES);
-        setPaymentMethods(DEMO_PAYMENT_METHODS);
-
-        const totalIncome   = DEMO_INCOME.reduce((s, i) => s + i.amount, 0);
-        const totalExpense  = DEMO_EXPENSE.reduce((s, e) => s + e.amount, 0);
-        const pendingLent   = DEMO_LENT.filter(isNotPaid).reduce((s, i) => s + i.amount, 0);
-        const pendingBorrow = DEMO_BORROWED.filter(isNotPaid).reduce((s, i) => s + i.amount, 0);
+        const demoData = getDemoData();
+        setCategories(demoData.DEMO_CATEGORIES);
+        setPaymentMethods(demoData.DEMO_PAYMENT_METHODS);
+        setAllIncome(demoData.DEMO_INCOME);
+        setAllExpense(demoData.DEMO_EXPENSE);
+        setAllLent(demoData.DEMO_LENT);
+        setAllBorrowed(demoData.DEMO_BORROWED);
+        
+        const pendingLent = demoData.DEMO_LENT.filter(isNotPaid).reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+        const pendingBorrowed = demoData.DEMO_BORROWED.filter(isNotPaid).reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+        
+        const incSum = demoData.DEMO_INCOME.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
+        const expSum = demoData.DEMO_EXPENSE.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
 
         setDashboardStats({
           pendingLentMoney:     pendingLent,
-          pendingBorrowedMoney: pendingBorrow,
-          currentBalance:       totalIncome - totalExpense - pendingLent + pendingBorrow,
+          pendingBorrowedMoney: pendingBorrowed,
+          currentBalance:       incSum - expSum - pendingLent + pendingBorrowed,
         });
         setLoading(false);
         return;
