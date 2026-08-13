@@ -10,11 +10,11 @@ import * as borrowedMoneyService from '../services/borrowedMoneyService';
 import * as categoryService from '../services/categoryService';
 import * as paymentMethodService from '../services/paymentMethodService';
 
-const isObjectId = (value) => {
+function isObjectId(value) {
   return typeof value === "string" && /^[a-f\d]{24}$/i.test(value);
-};
+}
 
-const getCategoryName = (category, categories) => {
+function getCategoryName(category, categories) {
   if (!category) return "-";
   if (typeof category === "object" && category.name) return category.name;
   if (typeof category === "string") {
@@ -22,9 +22,9 @@ const getCategoryName = (category, categories) => {
     return matchedCategory ? matchedCategory.name : "-";
   }
   return "-";
-};
+}
 
-const getPaymentMethodName = (paymentMethod, paymentMethods) => {
+function getPaymentMethodName(paymentMethod, paymentMethods) {
   if (!paymentMethod) return "-";
   if (typeof paymentMethod === "object" && paymentMethod.name) return paymentMethod.name;
   if (typeof paymentMethod === "string") {
@@ -32,37 +32,37 @@ const getPaymentMethodName = (paymentMethod, paymentMethods) => {
     return matchedPaymentMethod ? matchedPaymentMethod.name : "-";
   }
   return "-";
-};
+}
 
-const isSameMonth = (dateValue, selectedMonthDate) => {
+function isSameMonth(dateValue, selectedMonthDate) {
   if (!dateValue) return false;
   const recordDate = new Date(dateValue);
   return (
     recordDate.getMonth() === selectedMonthDate.getMonth() &&
     recordDate.getFullYear() === selectedMonthDate.getFullYear()
   );
-};
+}
 
-const normalizeArray = (response) => {
+function normalizeArray(response) {
   if (Array.isArray(response)) return response;
   if (response && Array.isArray(response.data)) return response.data;
   if (response && Array.isArray(response.records)) return response.records;
   return [];
-};
+}
 
-const isNotPaid = (item) => {
+function isNotPaid(item) {
   return item.isPaid === false || item.isPaid === "false" || item.isPaid === undefined || item.isPaid === null;
-};
+}
 
 // ── Demo mode constants (module-level, computed once) ────────────────────────
 const DEMO_TOKEN = 'demo-access-token';
 const _now = new Date();
-const _daysAgo = (days, monthOffset = 0) => {
+function _daysAgo(days, monthOffset = 0) {
   const dt = new Date(_now);
   dt.setMonth(dt.getMonth() + monthOffset);
   dt.setDate(dt.getDate() - days);
   return dt.toISOString();
-};
+}
 const DEMO_CATEGORIES = [
   { _id: 'c1', name: 'Salary' }, { _id: 'c2', name: 'Freelance' },
   { _id: 'c3', name: 'Food & Dining' }, { _id: 'c4', name: 'Transport' },
